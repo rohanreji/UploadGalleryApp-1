@@ -4,6 +4,6 @@ import com.myapp.uploadgallery.model.UpImage;
 
 import rx.Observable;
 
-public interface MainPresenter {
-    Observable<UpImage> checkImages(String userId);
+public interface MainPresenter extends BasePresenter {
+    Observable<UpImage> checkImages();
 }
