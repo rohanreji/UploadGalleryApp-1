@@ -15,7 +15,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -48,10 +47,9 @@ public class AppModule {
 
     @Provides
     @Singleton
-    GalleryEndpoint provideGalleryEndpoint(OkHttpClient client, Gson gson) {
+    GalleryEndpoint provideGalleryEndpoint(Gson gson) {
         Retrofit adapter = new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
-                .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
@@ -61,7 +59,7 @@ public class AppModule {
 
     @Provides
     @Singleton
-    MainPresenter provideMainPresenter() {
-        return new MainPresenterImpl();
+    MainPresenter provideMainPresenter(GalleryEndpoint endpoint, UserId userId) {
+        return new MainPresenterImpl(userId, endpoint);
     }
 }

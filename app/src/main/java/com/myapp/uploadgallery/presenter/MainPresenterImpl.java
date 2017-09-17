@@ -5,19 +5,16 @@ import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.model.UserId;
 
-import javax.inject.Inject;
-
 import rx.Observable;
 
 public class MainPresenterImpl implements MainPresenter {
-    @Inject
-    UserId userId;
+    private UserId userId;
 
-    @Inject
-    GalleryEndpoint endpoint;
+    private GalleryEndpoint endpoint;
 
-    @Inject
-    public MainPresenterImpl() {
+    public MainPresenterImpl(UserId userId, GalleryEndpoint endpoint) {
+        this.userId = userId;
+        this.endpoint = endpoint;
     }
 
     @Override
