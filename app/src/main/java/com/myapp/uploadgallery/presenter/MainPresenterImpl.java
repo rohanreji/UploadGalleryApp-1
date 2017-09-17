@@ -1,9 +1,14 @@
 package com.myapp.uploadgallery.presenter;
 
+import android.content.Context;
+
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.model.UserId;
+import com.myapp.uploadgallery.ui.GalleryAdapter;
+
+import java.util.ArrayList;
 
 import rx.Observable;
 
@@ -22,4 +27,5 @@ public class MainPresenterImpl implements MainPresenter {
         return endpoint.getImagesForUser(userId.get())
                 .flatMap((ImageResponse response) -> Observable.from(response.getImages()));
     }
+
 }

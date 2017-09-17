@@ -12,6 +12,7 @@ import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -21,14 +22,18 @@ import butterknife.ButterKnife;
  * Adapter for the gallery of uploaded images.
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
-    private List<UpImage> images;
+    private List<UpImage> images = new ArrayList<>();
     private LayoutInflater inflater;
     private Context context;
 
-    public GalleryAdapter(Context context, List<UpImage> images) {
+    public GalleryAdapter(Context context) {
         this.inflater = LayoutInflater.from(context);
-        this.images = images;
         this.context = context;
+    }
+
+    public void add(UpImage image) {
+        images.add(image);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -59,7 +64,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.ivCellImage)
         ImageView cellImage;
-        @BindView(R.id.tvCellTime) TextView cellTime;
+        @BindView(R.id.tvCellTime)
+        TextView cellTime;
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

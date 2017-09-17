@@ -6,4 +6,5 @@ import rx.Observable;
 
 public interface MainPresenter extends BasePresenter {
     Observable<UpImage> checkImages();
+
 }

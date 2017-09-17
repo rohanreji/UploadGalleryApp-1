@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.myapp.uploadgallery.R;
+import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.presenter.MainPresenter;
 
 import butterknife.BindView;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     FloatingActionButton fab;
 
     private MainPresenter mainPresenter;
+    private GalleryAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+
+        adapter = new GalleryAdapter(this);
     }
 
     @OnClick(R.id.fab)
@@ -74,8 +78,13 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
 
         mainPresenter.checkImages()
                 .subscribeOn(Schedulers.io())
-                .doOnTerminate(() -> Log.d("IMAGE", "TERMINATED!"))
+                .doOnTerminate(() -> {
+                    Log.d("IMAGE", "TERMINATED!");
+                    if (adapter.getItemCount() > 0) {
+                        // TODO: 9/18/17  add fragment
+                    }
+                })
+                .doOnNext((UpImage image) -> adapter.add(image))
                 .subscribe(UpImage -> Log.d("Image", String.valueOf("image")));
-
     }
 }
