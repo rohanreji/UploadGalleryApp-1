@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">UploadGallery</string>
+    <string name="action_settings">Settings</string>
+    <string name="empty_gallery">No images uploaded yet.\nPress \'+\' to start uploading process</string>
+</resources>
