@@ -1,8 +1,15 @@
 package com.myapp.uploadgallery.ui;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,6 +35,11 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     private MainPresenter mainPresenter;
     private GalleryAdapter adapter;
 
+    public static final int REQUEST_IMAGE_CAPTURE = 101;
+    public static final int REQUEST_IMAGE_GALLERY = 102;
+    public static final int PERMISSION_REQUEST_GALLERY = 103;
+    public static final int PERMISSION_REQUEST_CAMERA = 104;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 //        AndroidInjection.inject(this);
@@ -41,8 +53,29 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
 
     @OnClick(R.id.fab)
     public void onClick() {
-        Snackbar.make(fab, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_upload_title)
+                .setMessage(R.string.dialog_upload_message)
+
+                .setNegativeButton(R.string.dialog_upload_gallery,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(final DialogInterface dialogInterface,
+                                                final int i) {
+                                startGallery();
+                            }
+                        });
+        if (mainPresenter.hasCamera(this)) {
+            builder.setPositiveButton(R.string.dialog_upload_camera,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialogInterface,
+                                            final int i) {
+                            startCamera();
+                        }
+                    });
+        }
+        builder.create();
     }
 
     @Override
@@ -86,5 +119,36 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                 })
                 .doOnNext((UpImage image) -> adapter.add(image))
                 .subscribe(UpImage -> Log.d("Image", String.valueOf("image")));
+    }
+
+    @Override
+    public void startCamera() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSION_REQUEST_GALLERY);
+        } else {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
+
+    @Override
+    public void startGallery() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_GALLERY);
+        } else {
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            if (galleryIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
+            }
+        }
     }
 }
