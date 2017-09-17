@@ -1,12 +1,13 @@
 package com.myapp.uploadgallery.di;
 
-import android.app.Application;
 import android.content.Context;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.myapp.uploadgallery.BuildConfig;
+import com.myapp.uploadgallery.GalleryApp;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
+import com.myapp.uploadgallery.model.UserId;
 import com.myapp.uploadgallery.presenter.MainPresenter;
 import com.myapp.uploadgallery.presenter.MainPresenterImpl;
 
@@ -20,11 +21,23 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
-public abstract class AppModule {
+public class AppModule {
+    private GalleryApp application;
+
+    public AppModule(GalleryApp application) {
+        this.application = application;
+    }
+
     @Provides
     @Singleton
-    Context provideContext(Application application) {
+    Context provideContext() {
         return application;
+    }
+
+    @Provides
+    @Singleton
+    UserId provideUserId() {
+        return new UserId(application);
     }
 
     @Provides
@@ -35,11 +48,11 @@ public abstract class AppModule {
 
     @Provides
     @Singleton
-    GalleryEndpoint provideCarelinkApiEndpoint(OkHttpClient client, Gson sparkGson) {
+    GalleryEndpoint provideGalleryEndpoint(OkHttpClient client, Gson gson) {
         Retrofit adapter = new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create(sparkGson))
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 

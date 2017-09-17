@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
+import com.myapp.uploadgallery.di.AppComponent;
+import com.myapp.uploadgallery.di.AppModule;
 import com.myapp.uploadgallery.di.DaggerAppComponent;
 import com.myapp.uploadgallery.model.UserId;
 import com.myapp.uploadgallery.presenter.MainPresenter;
@@ -28,7 +30,10 @@ public class GalleryApp extends Application implements HasActivityInjector,
     @Override
     public void onCreate() {
         super.onCreate();
-        DaggerAppComponent.create().inject(this);
+        final AppComponent appComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+        appComponent.inject(this);
     }
 
     @Override
