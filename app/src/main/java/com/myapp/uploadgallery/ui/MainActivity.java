@@ -30,7 +30,6 @@ import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
 import com.myapp.uploadgallery.util.UniqueList;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -41,7 +40,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements Viewable {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
@@ -49,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     public static final int PERMISSION_REQUEST_GALLERY = 103;
     public static final int PERMISSION_REQUEST_CAMERA = 104;
     public static final String GALLERY = "GALLERY";
+    public static final String MANIPULATOR = "MANIPULATOR";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -66,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     GalleryManager galleryManager;
 
     private GalleryViewable galleryViewable;
+    private ManipulatorViewable manipulatorViewable;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -236,13 +236,23 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     }
 
     public void showManipulator(Bitmap bitmap) {
-        // TODO: 9/18/17 show manipulator fragment
-        galleryManager.onPictureChosen(this, bitmap)
-                .flatMap((File file) -> galleryManager.uploadCachedPicture(this, file))
-                .subscribeOn(Schedulers.io())
-                .doOnError((Throwable t) -> t.printStackTrace())
-                .doFinally(() -> galleryManager.onResume())
-                .subscribe();
+//        galleryManager.onPictureChosen(this, bitmap)
+//                .flatMap((File file) -> galleryManager.uploadCachedPicture(this, file))
+//                .subscribeOn(Schedulers.io())
+//                .doOnError((Throwable t) -> t.printStackTrace())
+//                .doFinally(() -> galleryManager.onResume())
+//                .subscribe();
+
+        if (manipulatorViewable == null) {
+            ManipulatorFragment newFragment = new ManipulatorFragment();
+            android.support.v4.app.FragmentTransaction transaction =
+                    getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.flFragment, newFragment, GALLERY);
+            transaction.addToBackStack(MANIPULATOR);
+            transaction.commit();
+            manipulatorViewable = newFragment;
+        }
+        manipulatorViewable.setBitmap(bitmap);
     }
 
     @Override

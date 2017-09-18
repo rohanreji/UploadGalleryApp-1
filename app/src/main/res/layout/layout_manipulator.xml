@@ -38,7 +38,7 @@
             android:layout_alignParentStart="true"
             android:layout_marginTop="@dimen/border_little_margin"
             android:layout_below="@+id/ivManipulatorSave"
-            custom:scv_background_color="@color/windowBackground"
+            custom:scv_background_color="@color/colorPrimaryDark"
             custom:scv_crop_mode="fit_image"
             custom:scv_frame_color="@color/colorAccent"
             custom:scv_frame_stroke_weight="1dp"
