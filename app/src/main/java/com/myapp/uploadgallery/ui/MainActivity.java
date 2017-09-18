@@ -4,10 +4,13 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
@@ -40,6 +44,20 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     public static final int REQUEST_IMAGE_GALLERY = 102;
     public static final int PERMISSION_REQUEST_GALLERY = 103;
     public static final int PERMISSION_REQUEST_CAMERA = 104;
+
+    private View.OnClickListener settingsListener = new View.OnClickListener() {
+        @Override
+        public void onClick(final View view) {
+            final Intent i = new Intent();
+            i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            i.addCategory(Intent.CATEGORY_DEFAULT);
+            i.setData(Uri.parse("package:" + getPackageName()));
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+            startActivity(i);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                         }
                     });
         }
-        builder.create();
+        builder.create().show();
     }
 
     @Override
@@ -153,5 +171,44 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                 startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
             }
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CAMERA: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startCamera();
+                } else {
+                    showNoCameraSnack();
+                }
+                return;
+            }
+            case PERMISSION_REQUEST_GALLERY: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    startGallery();
+                } else {
+                    showNoGallerySnack();
+                }
+                return;
+            }
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    public void showNoCameraSnack() {
+        showSnack(R.string.no_camera_permission);
+    }
+    public void showNoGallerySnack() {
+        showSnack(R.string.no_gallery_permission);
+    }
+
+    public void showSnack(int resId) {
+        Snackbar.make(fab, R.string.no_gallery_permission, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_settings, settingsListener).show();
     }
 }
