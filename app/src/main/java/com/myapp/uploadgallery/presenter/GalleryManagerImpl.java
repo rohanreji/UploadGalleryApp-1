@@ -8,6 +8,7 @@ import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
 import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.ui.Viewable;
+import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;
@@ -16,7 +17,6 @@ import java.io.OutputStream;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -48,8 +48,14 @@ public class GalleryManagerImpl implements GalleryManager {
                         imageResponse.getImages()))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .doOnNext((ImageUploadResponse image) -> {
+                    GalleryImage galleryImage = new GalleryImage();
+                    galleryImage.setCreated_at(DateFormatUtils.parseTime(image.getCreatedAt()));
+                    galleryImage.setUrl(galleryImage.getUrl());
+                    images.add(galleryImage);
+                    view.showProgress(true);
+                })
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
-                .doOnSubscribe((Disposable d) -> view.showProgress(true))
                 .doFinally(() -> {
                     view.showProgress(false);
                     imagesUpdated();

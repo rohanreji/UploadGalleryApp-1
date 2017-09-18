@@ -40,8 +40,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
-import rx.Observable;
-import rx.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements Viewable {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
@@ -111,10 +111,10 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     protected void onResume() {
         super.onResume();
 
-        galleryManager.onResume()
-                .subscribe(() -> showProgress(false));
+        galleryManager.onResume().subscribe();
     }
 
+    @Override
     public Observable<Void> showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
         emptyText.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
@@ -248,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
                 .flatMap((File file) -> galleryManager.uploadCachedPicture(this, file))
                 .subscribeOn(Schedulers.io())
                 .doOnError((Throwable t) -> t.printStackTrace())
-                .doOnUnsubscribe(() -> galleryManager.onResume())
+                .doFinally(() -> galleryManager.onResume())
                 .subscribe();
     }
 

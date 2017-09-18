@@ -47,6 +47,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         GalleryImage image = images.get(position);
         Picasso.with(context)
                 .load(image.getUrl())
+                .centerInside()
+                .error(R.drawable.ic_image)
                 .into(holder.cellImage);
         holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreated_at()));
     }

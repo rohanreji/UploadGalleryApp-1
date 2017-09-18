@@ -1,27 +1,22 @@
 package com.myapp.uploadgallery.util;
 
+import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Date format util methods.
  */
 public class DateFormatUtils {
-    static final SimpleDateFormat inputFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    public static long parseTime(String createdAt) {
-        long time = System.currentTimeMillis();
-        try {
-            final Date parse = inputFormat.parse(createdAt, new ParsePosition(0));
-            time = parse.getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return time;
+    public static long parseTime(@NonNull String createdAt) {
+        DateTimeFormatter parser2 = ISODateTimeFormat.dateTimeNoMillis();
+        final DateTime dateTime = parser2.parseDateTime(createdAt);
+        return dateTime.getMillis();
     }
 
     public static CharSequence getFormattedTimestamp(long time) {

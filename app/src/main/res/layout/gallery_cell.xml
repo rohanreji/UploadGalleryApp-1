@@ -5,6 +5,8 @@
 
     <ImageView
         android:id="@+id/ivCellImage"
+        android:maxHeight="50dp"
+        android:maxWidth="50dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

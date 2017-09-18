@@ -1,15 +1,14 @@
 package com.myapp.uploadgallery.api;
 
 import com.google.gson.annotations.Expose;
-import com.myapp.uploadgallery.model.GalleryImage;
 
 import java.util.ArrayList;
 
 public class ImageResponse {
     @Expose
-    ArrayList<GalleryImage> images;
+    ArrayList<ImageUploadResponse> images;
 
-    public ArrayList<GalleryImage> getImages() {
+    public ArrayList<ImageUploadResponse> getImages() {
         return images;
     }
 }

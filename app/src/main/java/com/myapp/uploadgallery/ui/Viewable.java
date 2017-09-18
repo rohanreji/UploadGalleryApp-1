@@ -3,11 +3,7 @@ package com.myapp.uploadgallery.ui;
 import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.util.UniqueList;
 
-import rx.Observable;
-
-/**
- * Created by margarita on 9/18/17.
- */
+import io.reactivex.Observable;
 
 public interface Viewable {
     void showStubText();

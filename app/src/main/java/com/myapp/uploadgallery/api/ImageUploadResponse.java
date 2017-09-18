@@ -1,14 +1,15 @@
 package com.myapp.uploadgallery.api;
 
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by margarita on 9/18/17.
- */
+
 
 public class ImageUploadResponse {
     @Expose
     String url;
+
+    @SerializedName("created_at")
     @Expose
     String createdAt;
 
