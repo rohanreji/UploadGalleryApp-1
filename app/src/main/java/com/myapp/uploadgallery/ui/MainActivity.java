@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -23,7 +24,7 @@ import android.view.View;
 
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
-import com.myapp.uploadgallery.presenter.MainPresenter;
+import com.myapp.uploadgallery.presenter.GalleryManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
-    private MainPresenter mainPresenter;
+    private GalleryManager galleryManager;
     private GalleryAdapter adapter;
 
     public static final int REQUEST_IMAGE_CAPTURE = 101;
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                                 startGallery();
                             }
                         });
-        if (mainPresenter.hasCamera(this)) {
+        if (galleryManager.hasCamera(this)) {
             builder.setPositiveButton(R.string.dialog_upload_camera,
                     new DialogInterface.OnClickListener() {
                         @Override
@@ -120,15 +121,15 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     }
 
     @Override
-    public void setPresenter(final MainPresenter presenter) {
-        this.mainPresenter = presenter;
+    public void setManager(final GalleryManager presenter) {
+        this.galleryManager = presenter;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
-        mainPresenter.checkImages()
+        galleryManager.checkImages()
                 .subscribeOn(Schedulers.io())
                 .doOnTerminate(() -> {
                     Log.d("IMAGE", "TERMINATED!");
@@ -195,20 +196,18 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                 }
                 return;
             }
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
-    public void showNoCameraSnack() {
+    protected void showNoCameraSnack() {
         showSnack(R.string.no_camera_permission);
     }
-    public void showNoGallerySnack() {
+    protected void showNoGallerySnack() {
         showSnack(R.string.no_gallery_permission);
     }
 
-    public void showSnack(int resId) {
-        Snackbar.make(fab, R.string.no_gallery_permission, Snackbar.LENGTH_INDEFINITE)
+    protected void showSnack(@StringRes int resId) {
+        Snackbar.make(fab, resId, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_settings, settingsListener).show();
     }
 }

@@ -8,8 +8,8 @@ import com.myapp.uploadgallery.BuildConfig;
 import com.myapp.uploadgallery.GalleryApp;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.model.UserId;
-import com.myapp.uploadgallery.presenter.MainPresenter;
-import com.myapp.uploadgallery.presenter.MainPresenterImpl;
+import com.myapp.uploadgallery.presenter.GalleryManager;
+import com.myapp.uploadgallery.presenter.GalleryManagerImpl;
 
 import javax.inject.Singleton;
 
@@ -59,7 +59,7 @@ public class AppModule {
 
     @Provides
     @Singleton
-    MainPresenter provideMainPresenter(GalleryEndpoint endpoint, UserId userId) {
-        return new MainPresenterImpl(userId, endpoint);
+    GalleryManager provideMainPresenter(GalleryEndpoint endpoint, UserId userId) {
+        return new GalleryManagerImpl(userId, endpoint);
     }
 }

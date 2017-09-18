@@ -1,10 +1,7 @@
 package com.myapp.uploadgallery.presenter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.provider.MediaStore;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
@@ -14,13 +11,13 @@ import com.myapp.uploadgallery.ui.MainViewable;
 
 import rx.Observable;
 
-public class MainPresenterImpl implements MainPresenter {
+public class GalleryManagerImpl implements GalleryManager {
     private UserId userId;
     private GalleryEndpoint endpoint;
     private MainViewable view;
 
 
-    public MainPresenterImpl(UserId userId, GalleryEndpoint endpoint) {
+    public GalleryManagerImpl(UserId userId, GalleryEndpoint endpoint) {
         this.userId = userId;
         this.endpoint = endpoint;
     }

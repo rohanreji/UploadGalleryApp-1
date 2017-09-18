@@ -6,12 +6,9 @@ import android.os.Bundle;
 
 import com.myapp.uploadgallery.di.AppComponent;
 import com.myapp.uploadgallery.di.AppModule;
-import com.myapp.uploadgallery.di
-        .DaggerAppComponent;
+import com.myapp.uploadgallery.di.DaggerAppComponent;
 import com.myapp.uploadgallery.model.UserId;
-import com.myapp.uploadgallery.presenter.MainPresenter;
-import com.myapp.uploadgallery.ui.MainActivity;
-import com.myapp.uploadgallery.ui.MainViewable;
+import com.myapp.uploadgallery.presenter.GalleryManager;
 
 import javax.inject.Inject;
 
@@ -25,7 +22,7 @@ public class GalleryApp extends Application implements HasActivityInjector,
     DispatchingAndroidInjector<Activity> activityInjector;
 
     @Inject
-    MainPresenter presenter;
+    GalleryManager manager;
 
     @Inject
     UserId userId;
@@ -54,9 +51,7 @@ public class GalleryApp extends Application implements HasActivityInjector,
 
     @Override
     public void onActivityCreated(final Activity activity, final Bundle bundle) {
-        if (activity instanceof MainViewable) {
-            ((MainActivity) activity).setPresenter(presenter);
-        }
+
     }
 
     @Override

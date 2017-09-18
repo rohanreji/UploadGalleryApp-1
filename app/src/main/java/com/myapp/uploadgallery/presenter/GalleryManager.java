@@ -7,7 +7,7 @@ import com.myapp.uploadgallery.ui.MainViewable;
 
 import rx.Observable;
 
-public interface MainPresenter extends BasePresenter {
+public interface GalleryManager {
     void setView(MainViewable view);
 
     Observable<UpImage> checkImages();
