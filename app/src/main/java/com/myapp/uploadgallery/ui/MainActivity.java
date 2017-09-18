@@ -13,6 +13,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -80,15 +81,8 @@ public class MainActivity extends AppCompatActivity implements Viewable {
         AlertDialog.Builder builder = new AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_upload_title)
                 .setMessage(R.string.dialog_upload_message)
-
                 .setNegativeButton(R.string.dialog_upload_gallery,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(final DialogInterface dialogInterface,
-                                                final int i) {
-                                startGallery();
-                            }
-                        });
+                        (DialogInterface dialog, int which) -> startGallery());
 //        if (galleryManager.hasCamera(this)) {
 //            builder.setPositiveButton(R.string.dialog_upload_camera,
 //                    new DialogInterface.OnClickListener() {
@@ -197,11 +191,11 @@ public class MainActivity extends AppCompatActivity implements Viewable {
 
     @Override
     public void showStubText() {
-
+        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     @Override
     public void showGallery(final UniqueList<UpImage> images) {
-
+        // TODO: 9/18/17 show gallery
     }
 }
