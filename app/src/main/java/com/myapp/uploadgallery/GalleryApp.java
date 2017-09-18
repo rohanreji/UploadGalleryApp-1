@@ -40,10 +40,6 @@ public class GalleryApp extends Application implements HasActivityInjector,
         registerActivityLifecycleCallbacks(this);
     }
 
-    public AppComponent getComponent() {
-        return appComponent;
-    }
-
     @Override
     public AndroidInjector<Activity> activityInjector() {
         return activityInjector;

@@ -52,4 +52,23 @@ public class UpImage {
         return DateUtils.getRelativeTimeSpanString(timestamp,
                 Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS, 0);
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof UpImage)) {
+            return false;
+        }
+
+        final UpImage upImage = (UpImage) o;
+
+        return timestamp == upImage.timestamp;
+
+    }
+    @Override
+    public int hashCode() {
+        return (int) (timestamp ^ (timestamp >>> 32));
+    }
 }

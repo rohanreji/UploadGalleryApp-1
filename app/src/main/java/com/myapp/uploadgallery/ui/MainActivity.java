@@ -17,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,26 +24,31 @@ import android.view.View;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
+import com.myapp.uploadgallery.presenter.UniqueList;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.schedulers.Schedulers;
+import dagger.android.AndroidInjection;
 
-public class MainActivity extends AppCompatActivity implements MainViewable {
+public class MainActivity extends AppCompatActivity implements Viewable {
+    public static final int REQUEST_IMAGE_CAPTURE = 101;
+    public static final int REQUEST_IMAGE_GALLERY = 102;
+    public static final int PERMISSION_REQUEST_GALLERY = 103;
+    public static final int PERMISSION_REQUEST_CAMERA = 104;
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
 
-    private GalleryManager galleryManager;
-    private GalleryAdapter adapter;
+    @Inject
+    GalleryManager galleryManager;
 
-    public static final int REQUEST_IMAGE_CAPTURE = 101;
-    public static final int REQUEST_IMAGE_GALLERY = 102;
-    public static final int PERMISSION_REQUEST_GALLERY = 103;
-    public static final int PERMISSION_REQUEST_CAMERA = 104;
+    private GalleryAdapter adapter;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -62,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        AndroidInjection.inject(this);
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -85,34 +89,29 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                                 startGallery();
                             }
                         });
-        if (galleryManager.hasCamera(this)) {
-            builder.setPositiveButton(R.string.dialog_upload_camera,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(final DialogInterface dialogInterface,
-                                            final int i) {
-                            startCamera();
-                        }
-                    });
-        }
+//        if (galleryManager.hasCamera(this)) {
+//            builder.setPositiveButton(R.string.dialog_upload_camera,
+//                    new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(final DialogInterface dialogInterface,
+//                                            final int i) {
+//                            startCamera();
+//                        }
+//                    });
+//        }
         builder.create().show();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -121,27 +120,12 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     }
 
     @Override
-    public void setManager(final GalleryManager presenter) {
-        this.galleryManager = presenter;
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
-        galleryManager.checkImages()
-                .subscribeOn(Schedulers.io())
-                .doOnTerminate(() -> {
-                    Log.d("IMAGE", "TERMINATED!");
-                    if (adapter.getItemCount() > 0) {
-                        // TODO: 9/18/17  add fragment
-                    }
-                })
-                .doOnNext((UpImage image) -> adapter.add(image))
-                .subscribe(UpImage -> Log.d("Image", String.valueOf("image")));
+        galleryManager.onResume();
     }
 
-    @Override
     public void startCamera() {
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
@@ -157,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
         }
     }
 
-    @Override
     public void startGallery() {
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -185,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                 } else {
                     showNoCameraSnack();
                 }
-                return;
+                break;
             }
             case PERMISSION_REQUEST_GALLERY: {
                 if (grantResults.length > 0
@@ -194,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
                 } else {
                     showNoGallerySnack();
                 }
-                return;
+                break;
             }
         }
     }
@@ -202,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     protected void showNoCameraSnack() {
         showSnack(R.string.no_camera_permission);
     }
+
     protected void showNoGallerySnack() {
         showSnack(R.string.no_gallery_permission);
     }
@@ -209,5 +193,15 @@ public class MainActivity extends AppCompatActivity implements MainViewable {
     protected void showSnack(@StringRes int resId) {
         Snackbar.make(fab, resId, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_settings, settingsListener).show();
+    }
+
+    @Override
+    public void showStubText() {
+
+    }
+
+    @Override
+    public void showGallery(final UniqueList<UpImage> images) {
+
     }
 }
