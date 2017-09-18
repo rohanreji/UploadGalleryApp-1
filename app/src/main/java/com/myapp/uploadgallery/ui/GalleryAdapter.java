@@ -45,8 +45,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         GalleryImage image = images.get(position);
-        Picasso.with(context)
-                .load(image.getUrl())
+        final Picasso picasso = Picasso.with(context);
+        picasso.setLoggingEnabled(true);
+        picasso.load(image.getUrl())
                 .centerInside()
                 .error(R.drawable.ic_image)
                 .into(holder.cellImage);
