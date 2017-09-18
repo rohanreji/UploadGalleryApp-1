@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
@@ -14,6 +15,8 @@ import com.myapp.uploadgallery.util.UniqueList;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.text.ParsePosition;
+import java.util.Date;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -44,7 +47,10 @@ public class GalleryManagerImpl implements GalleryManager {
                 .flatMap((ImageResponse response) -> Observable.from(response.getImages()))
                 .subscribeOn(Schedulers.io())
                 .doOnNext((UpImage image) -> images.add(image))
-                .doOnError((Throwable t) -> {imagesUpdated(); t.printStackTrace();})
+                .doOnError((Throwable t) -> {
+                    imagesUpdated();
+                    t.printStackTrace();
+                })
                 .doOnUnsubscribe(() -> imagesUpdated())
                 .subscribe(UpImage -> Log.d("Image", String.valueOf("image")));
     }
@@ -96,9 +102,22 @@ public class GalleryManagerImpl implements GalleryManager {
             return endpoint.postImageForUser(userId.get(), part)
                     .flatMap((ImageUploadResponse response) -> {
                         UpImage upImage = new UpImage();
-                        upImage.setTimestamp(System.currentTimeMillis());
+                        upImage.setUrl(response.getUrl());
+                        long time = parseTime(response.getCreatedAt());
+                        upImage.setCreated_at(time);
                         return Observable.just(upImage);
                     });
         });
+    }
+
+    protected long parseTime(String createdAt) {
+        long time = System.currentTimeMillis();
+        try {
+            final Date parse = ISO8601Utils.parse(createdAt, new ParsePosition(0));
+            time = parse.getTime();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return time;
     }
 }

@@ -7,9 +7,11 @@ import android.os.Bundle;
 import com.myapp.uploadgallery.di.AppComponent;
 import com.myapp.uploadgallery.di.AppModule;
 import com.myapp.uploadgallery.di.DaggerAppComponent;
-import com.myapp.uploadgallery.presenter.UserId;
 import com.myapp.uploadgallery.presenter.GalleryManager;
+import com.myapp.uploadgallery.presenter.UserId;
 import com.myapp.uploadgallery.ui.Viewable;
+
+import net.danlew.android.joda.JodaTimeAndroid;
 
 import javax.inject.Inject;
 
@@ -39,6 +41,7 @@ public class GalleryApp extends Application implements HasActivityInjector,
         appComponent.inject(this);
 
         registerActivityLifecycleCallbacks(this);
+        JodaTimeAndroid.init(this);
     }
 
     @Override

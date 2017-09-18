@@ -46,11 +46,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         UpImage image = images.get(position);
         Picasso.with(context)
-                .load(image.getLocation())
+                .load(image.getUrl())
                 .resize(120, 60)
                 .into(holder.cellImage);
         holder.cellTime.setText(image.getFormattedTimestamp());
-
     }
 
     @Override

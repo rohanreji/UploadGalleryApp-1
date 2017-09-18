@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
                 .flatMap((File file) -> galleryManager.uploadCachedPicture(this, file))
                 .subscribeOn(Schedulers.io())
                 .doOnError((Throwable t) -> t.printStackTrace())
-                .doOnTerminate(() -> galleryManager.onResume())
+                .doOnUnsubscribe(() -> galleryManager.onResume())
                 .subscribe();
     }
 }

@@ -20,14 +20,21 @@ public class UniqueList<T> extends ArrayList<T> {
 
     @Override
     public void add(final int index, final T element) {
-        if (set.add(element)) {
-            super.add(index, element);
-        }
+        throw new IllegalArgumentException("Method not supported!");
     }
 
     @Override
     public boolean addAll(final Collection<? extends T> c) {
         c.removeAll(set);
-        return super.addAll(c);
+        boolean addedOne = false;
+        for (T t : c) {
+            addedOne |= add(t);
+        }
+        return addedOne;
+    }
+
+    @Override
+    public boolean addAll(final int index, final Collection<? extends T> c) {
+        throw new IllegalArgumentException("Method not supported!");
     }
 }

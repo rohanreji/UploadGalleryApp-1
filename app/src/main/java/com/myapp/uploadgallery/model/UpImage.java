@@ -9,47 +9,27 @@ import java.util.Calendar;
  * Pojo for an image.
  */
 public class UpImage {
-    String location;
-    int width, height;
-    String uploadedLocation;
-    long timestamp;
+    String url;
+    long created_at;
 
     public static final SimpleDateFormat inputFormat =
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
-    public String getLocation() {
-        return location;
+    public String getUrl() {
+        return url;
     }
-    public void setLocation(final String location) {
-        this.location = location;
+    public void setUrl(final String url) {
+        this.url = url;
     }
-    public int getWidth() {
-        return width;
+    public long getCreated_at() {
+        return created_at;
     }
-    public void setWidth(final int width) {
-        this.width = width;
-    }
-    public int getHeight() {
-        return height;
-    }
-    public void setHeight(final int height) {
-        this.height = height;
-    }
-    public String getUploadedLocation() {
-        return uploadedLocation;
-    }
-    public void setUploadedLocation(final String uploadedLocation) {
-        this.uploadedLocation = uploadedLocation;
-    }
-    public long getTimestamp() {
-        return timestamp;
-    }
-    public void setTimestamp(final long timestamp) {
-        this.timestamp = timestamp;
+    public void setCreated_at(final long created_at) {
+        this.created_at = created_at;
     }
 
     public CharSequence getFormattedTimestamp() {
-        return DateUtils.getRelativeTimeSpanString(timestamp,
+        return DateUtils.getRelativeTimeSpanString(created_at,
                 Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS, 0);
     }
 
@@ -64,11 +44,11 @@ public class UpImage {
 
         final UpImage upImage = (UpImage) o;
 
-        return timestamp == upImage.timestamp;
+        return created_at == upImage.created_at;
 
     }
     @Override
     public int hashCode() {
-        return (int) (timestamp ^ (timestamp >>> 32));
+        return (int) (created_at ^ (created_at >>> 32));
     }
 }
