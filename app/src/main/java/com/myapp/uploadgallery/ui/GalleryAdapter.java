@@ -32,9 +32,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         this.context = context;
     }
 
-    public void setImages(List<UpImage> images) {
-        this.images.addAll(images);
-        notifyDataSetChanged();
+    public void setImages(List<UpImage> pics) {
+        this.images.addAll(pics);
     }
 
     @Override
@@ -48,7 +47,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         UpImage image = images.get(position);
         Picasso.with(context)
                 .load(image.getUrl())
-                .resize(120, 60)
                 .into(holder.cellImage);
         holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreated_at()));
     }

@@ -14,12 +14,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import rx.Completable;
-import rx.Observable;
-import rx.schedulers.Schedulers;
 
 import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
 
@@ -41,16 +42,18 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
-    public Completable onResume() {
+    public Observable onResume() {
         return endpoint.getImagesForUser(userId.get())
-                .flatMap((ImageResponse response) -> Observable.from(response.getImages()))
+                .flatMap((ImageResponse imageResponse) -> Observable.fromIterable(
+                        imageResponse.getImages()))
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .doOnNext((UpImage image) -> images.add(image))
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
-                .doOnCompleted(() -> imagesUpdated())
-                .doOnSubscribe(() -> view.showProgress(true))
-                .doOnUnsubscribe(() -> view.showProgress(false))
-                .toCompletable();
+                .doOnSubscribe((Disposable d) -> view.showProgress(true))
+                .doFinally(() -> {
+                    view.showProgress(false);
+                    imagesUpdated();
+                });
     }
 
     private void imagesUpdated() {
