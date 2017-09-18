@@ -1,6 +1,5 @@
 package com.myapp.uploadgallery.ui;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +23,6 @@ import butterknife.ButterKnife;
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     private List<GalleryImage> images = new UniqueList<>();
-    private LayoutInflater inflater;
-    private Context context;
-
-    public GalleryAdapter(Context context) {
-        this.inflater = LayoutInflater.from(context);
-        this.context = context;
-    }
 
     public void setImages(List<GalleryImage> pics) {
         this.images.addAll(pics);
@@ -38,14 +30,15 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     @Override
     public ViewHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
-        View view = inflater.inflate(R.layout.gallery_cell, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.gallery_cell, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         GalleryImage image = images.get(position);
-        final Picasso picasso = Picasso.with(context);
+        final Picasso picasso = Picasso.with(holder.cellImage.getContext());
         picasso.setLoggingEnabled(true);
         picasso.load(image.getUrl())
                 .centerInside()

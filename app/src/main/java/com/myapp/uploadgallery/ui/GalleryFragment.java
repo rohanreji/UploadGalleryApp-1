@@ -33,7 +33,7 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
         ButterKnife.bind(this, view);
 
         galleryView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new GalleryAdapter(getContext());
+        adapter = new GalleryAdapter();
         galleryView.setAdapter(adapter);
 
         if (listener != null) {

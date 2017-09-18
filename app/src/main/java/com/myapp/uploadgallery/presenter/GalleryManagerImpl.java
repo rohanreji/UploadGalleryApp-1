@@ -44,28 +44,30 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
 
     @Override
     public Observable onResume() {
+        view.showProgress(true);
         return endpoint.getImagesForUser(userId.get())
                 .flatMap((ImageResponse imageResponse) -> Observable.fromIterable(
                         imageResponse.getImages()))
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnNext((ImageUploadResponse iur) -> view.showProgress(true))
                 .doOnNext((ImageUploadResponse image) -> {
+                    view.showProgress(true);
                     GalleryImage galleryImage = new GalleryImage();
-                    galleryImage.setCreated_at(DateFormatUtils.parseTime(image.getCreatedAt()));
+                    galleryImage.setCreated_at(
+                            DateFormatUtils.parseTime(image.getCreatedAt()));
                     galleryImage.setUrl(galleryImage.getUrl());
                     images.add(galleryImage);
-                    view.showProgress(true);
                 })
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
-                .doOnComplete(() -> imagesUpdated())
-                .doFinally(() -> {
-                    view.showProgress(false);
+                .doOnComplete(() -> {
                     imagesUpdated();
                 });
     }
 
     private void imagesUpdated() {
         if (images.size() == 0) {
+            view.showProgress(false);
             view.showStubText();
         } else {
             view.showGallery(images);
@@ -125,5 +127,6 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     @Override
     public void onViewCreated() {
         imagesUpdated();
+        view.showProgress(false);
     }
 }
