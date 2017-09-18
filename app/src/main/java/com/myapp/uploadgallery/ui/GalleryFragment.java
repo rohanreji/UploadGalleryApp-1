@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.myapp.uploadgallery.R;
-import com.myapp.uploadgallery.model.UpImage;
+import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import butterknife.BindView;
@@ -44,7 +44,7 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
     }
 
     @Override
-    public void setImages(final UniqueList<UpImage> images) {
+    public void setImages(final UniqueList<GalleryImage> images) {
         adapter.setImages(images);
         adapter.notifyDataSetChanged();
     }

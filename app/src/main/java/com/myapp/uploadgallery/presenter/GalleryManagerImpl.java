@@ -6,7 +6,7 @@ import android.graphics.Bitmap;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
-import com.myapp.uploadgallery.model.UpImage;
+import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.ui.Viewable;
 import com.myapp.uploadgallery.util.UniqueList;
 
@@ -27,7 +27,7 @@ import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
 public class GalleryManagerImpl implements GalleryManager {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
-    private final UniqueList<UpImage> images;
+    private final UniqueList<GalleryImage> images;
     private Viewable view;
 
     public GalleryManagerImpl(final UserId userId, final GalleryEndpoint endpoint) {
@@ -92,7 +92,7 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
-    public Observable<UpImage> uploadCachedPicture(final Context context, final File file) {
+    public Observable<GalleryImage> uploadCachedPicture(final Context context, final File file) {
         return Observable.defer(() -> {
             RequestBody body = RequestBody.create(MediaType.parse("image/*"), file);
             MultipartBody.Part part =
@@ -100,11 +100,11 @@ public class GalleryManagerImpl implements GalleryManager {
 
             return endpoint.postImageForUser(userId.get(), part)
                     .flatMap((ImageUploadResponse response) -> {
-                        UpImage upImage = new UpImage();
-                        upImage.setUrl(response.getUrl());
+                        GalleryImage galleryImage = new GalleryImage();
+                        galleryImage.setUrl(response.getUrl());
                         long time = parseTime(response.getCreatedAt());
-                        upImage.setCreated_at(time);
-                        return Observable.just(upImage);
+                        galleryImage.setCreated_at(time);
+                        return Observable.just(galleryImage);
                     });
         });
     }

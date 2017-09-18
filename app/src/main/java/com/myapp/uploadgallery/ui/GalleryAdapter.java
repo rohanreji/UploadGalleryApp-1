@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.myapp.uploadgallery.R;
-import com.myapp.uploadgallery.model.UpImage;
+import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
 import com.squareup.picasso.Picasso;
@@ -23,7 +23,7 @@ import butterknife.ButterKnife;
  * Adapter for the gallery of uploaded images.
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
-    private List<UpImage> images = new UniqueList<>();
+    private List<GalleryImage> images = new UniqueList<>();
     private LayoutInflater inflater;
     private Context context;
 
@@ -32,7 +32,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         this.context = context;
     }
 
-    public void setImages(List<UpImage> pics) {
+    public void setImages(List<GalleryImage> pics) {
         this.images.addAll(pics);
     }
 
@@ -44,7 +44,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        UpImage image = images.get(position);
+        GalleryImage image = images.get(position);
         Picasso.with(context)
                 .load(image.getUrl())
                 .into(holder.cellImage);

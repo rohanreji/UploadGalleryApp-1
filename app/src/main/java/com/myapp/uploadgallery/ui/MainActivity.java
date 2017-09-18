@@ -26,7 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.myapp.uploadgallery.R;
-import com.myapp.uploadgallery.model.UpImage;
+import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
 import com.myapp.uploadgallery.util.UniqueList;
 
@@ -224,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     }
 
     @Override
-    public void showGallery(final UniqueList<UpImage> images) {
+    public void showGallery(final UniqueList<GalleryImage> images) {
         if (galleryViewable == null) {
             // Create new fragment and transaction
             GalleryFragment newFragment = new GalleryFragment();
