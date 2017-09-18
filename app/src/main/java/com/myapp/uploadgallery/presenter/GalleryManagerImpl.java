@@ -10,6 +10,7 @@ import com.myapp.uploadgallery.api.ImageUploadResponse;
 import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.model.UserId;
 import com.myapp.uploadgallery.ui.Viewable;
+import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -84,8 +85,8 @@ public class GalleryManagerImpl implements GalleryManager {
     @Override
     public Observable<UpImage> uploadCachedPicture(final Context context, final File file) {
         return Observable.defer(() -> {
-            RequestBody fbody = RequestBody.create(MediaType.parse("image/*"), file);
-            MultipartBody.Part part = MultipartBody.Part.createFormData("image", file.getName(), fbody);
+            RequestBody body = RequestBody.create(MediaType.parse("image/*"), file);
+            MultipartBody.Part part = MultipartBody.Part.createFormData("image", file.getName(), body);
 
             return endpoint.postImageForUser(userId.get(), part)
                     .flatMap((ImageUploadResponse response) -> {

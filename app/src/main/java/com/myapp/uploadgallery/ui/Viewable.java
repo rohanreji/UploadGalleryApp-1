@@ -1,7 +1,7 @@
 package com.myapp.uploadgallery.ui;
 
 import com.myapp.uploadgallery.model.UpImage;
-import com.myapp.uploadgallery.presenter.UniqueList;
+import com.myapp.uploadgallery.util.UniqueList;
 
 /**
  * Created by margarita on 9/18/17.

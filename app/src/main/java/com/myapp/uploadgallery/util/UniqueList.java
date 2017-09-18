@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.presenter;
+package com.myapp.uploadgallery.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;

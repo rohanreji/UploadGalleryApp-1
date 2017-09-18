@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
-import com.myapp.uploadgallery.presenter.UniqueList;
+import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;
 import java.io.FileNotFoundException;
