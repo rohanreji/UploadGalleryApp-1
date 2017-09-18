@@ -4,6 +4,8 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,11 +23,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
 import com.myapp.uploadgallery.presenter.UniqueList;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import javax.inject.Inject;
 
@@ -33,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
+import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements Viewable {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
@@ -176,6 +184,29 @@ public class MainActivity extends AppCompatActivity implements Viewable {
         }
     }
 
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode,
+                                    final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                Bundle extras = data.getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                showManipulator(imageBitmap);
+            } else if (requestCode == REQUEST_IMAGE_GALLERY) {
+                try {
+                    final Uri imageUri = data.getData();
+                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
+                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                    showManipulator(selectedImage);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
+                            .show();
+                }
+            }
+        }
+    }
     protected void showNoCameraSnack() {
         showSnack(R.string.no_camera_permission);
     }
@@ -197,5 +228,15 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     @Override
     public void showGallery(final UniqueList<UpImage> images) {
         // TODO: 9/18/17 show gallery
+    }
+
+    public void showManipulator(Bitmap bitmap) {
+        // TODO: 9/18/17 show manipulator fragment
+        galleryManager.onPictureChosen(this, bitmap)
+                .flatMap((File file) -> galleryManager.uploadCachedPicture(this, file))
+                .subscribeOn(Schedulers.io())
+                .doOnError((Throwable t) -> t.printStackTrace())
+                .doOnTerminate(() -> galleryManager.onResume())
+                .subscribe();
     }
 }

@@ -15,6 +15,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -48,8 +50,13 @@ public class AppModule {
     @Provides
     @Singleton
     GalleryEndpoint provideGalleryEndpoint(Gson gson) {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
         Retrofit adapter = new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
@@ -59,7 +66,7 @@ public class AppModule {
 
     @Provides
     @Singleton
-    GalleryManager provideMainPresenter(GalleryEndpoint endpoint, UserId userId) {
+    GalleryManager provideGalleryManager(GalleryEndpoint endpoint, UserId userId) {
         return new GalleryManagerImpl(userId, endpoint);
     }
 }
