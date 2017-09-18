@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.myapp.uploadgallery.model.GalleryImage;
+import com.myapp.uploadgallery.ui.GalleryViewable;
 import com.myapp.uploadgallery.ui.Viewable;
 
 import java.io.File;
@@ -15,4 +16,5 @@ public interface GalleryManager {
     Observable<File> onPictureChosen(Context context, Bitmap bitmap);
     Observable<GalleryImage> uploadCachedPicture(Context context, File file);
     void setView(Viewable view);
+    GalleryViewable.GalleryViewableListener getCallback();
 }

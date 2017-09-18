@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     @Inject
     GalleryManager galleryManager;
 
-    private GalleryAdapter adapter;
     private GalleryViewable galleryViewable;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
@@ -89,8 +88,6 @@ public class MainActivity extends AppCompatActivity implements Viewable {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
-        adapter = new GalleryAdapter(this);
     }
 
     @OnClick(R.id.fab)
@@ -230,14 +227,10 @@ public class MainActivity extends AppCompatActivity implements Viewable {
             GalleryFragment newFragment = new GalleryFragment();
             android.support.v4.app.FragmentTransaction transaction =
                     getSupportFragmentManager().beginTransaction();
-
-            // Replace whatever is in the fragment_container view with this fragment,
-            // and add the transaction to the back stack
             transaction.add(R.id.flFragment, newFragment, GALLERY);
-
-            // Commit the transaction
             transaction.commit();
             galleryViewable = newFragment;
+            galleryViewable.setCallback(galleryManager.getCallback());
         }
         galleryViewable.setImages(images);
     }

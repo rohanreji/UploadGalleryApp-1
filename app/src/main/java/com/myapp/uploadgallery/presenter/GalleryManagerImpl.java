@@ -7,6 +7,7 @@ import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
 import com.myapp.uploadgallery.model.GalleryImage;
+import com.myapp.uploadgallery.ui.GalleryViewable;
 import com.myapp.uploadgallery.ui.Viewable;
 import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
@@ -24,7 +25,7 @@ import okhttp3.RequestBody;
 
 import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
 
-public class GalleryManagerImpl implements GalleryManager {
+public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryViewableListener {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private final UniqueList<GalleryImage> images;
@@ -56,6 +57,7 @@ public class GalleryManagerImpl implements GalleryManager {
                     view.showProgress(true);
                 })
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
+                .doOnComplete(() -> imagesUpdated())
                 .doFinally(() -> {
                     view.showProgress(false);
                     imagesUpdated();
@@ -115,5 +117,13 @@ public class GalleryManagerImpl implements GalleryManager {
         });
     }
 
+    @Override
+    public GalleryViewable.GalleryViewableListener getCallback() {
+        return this;
+    }
 
+    @Override
+    public void onViewCreated() {
+        imagesUpdated();
+    }
 }

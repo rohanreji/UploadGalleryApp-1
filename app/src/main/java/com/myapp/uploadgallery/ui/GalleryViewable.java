@@ -5,4 +5,9 @@ import com.myapp.uploadgallery.util.UniqueList;
 
 public interface GalleryViewable {
     void setImages(UniqueList<GalleryImage> images);
+    void setCallback(GalleryViewableListener galleryViewableListener);
+
+    interface GalleryViewableListener {
+        void onViewCreated();
+    }
 }
