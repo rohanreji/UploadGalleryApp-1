@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.google.gson.internal.bind.util.ISO8601Utils;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
@@ -15,14 +14,14 @@ import com.myapp.uploadgallery.util.UniqueList;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.text.ParsePosition;
-import java.util.Date;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
 import rx.schedulers.Schedulers;
+
+import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
 
 public class GalleryManagerImpl implements GalleryManager {
     private final UserId userId;
@@ -110,14 +109,5 @@ public class GalleryManagerImpl implements GalleryManager {
         });
     }
 
-    protected long parseTime(String createdAt) {
-        long time = System.currentTimeMillis();
-        try {
-            final Date parse = ISO8601Utils.parse(createdAt, new ParsePosition(0));
-            time = parse.getTime();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return time;
-    }
+
 }

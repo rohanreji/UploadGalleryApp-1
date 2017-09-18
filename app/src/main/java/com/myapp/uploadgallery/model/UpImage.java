@@ -2,18 +2,14 @@ package com.myapp.uploadgallery.model;
 
 import android.text.format.DateUtils;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
  * Pojo for an image.
  */
 public class UpImage {
-    String url;
-    long created_at;
-
-    public static final SimpleDateFormat inputFormat =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    private String url;
+    private long created_at;
 
     public String getUrl() {
         return url;
