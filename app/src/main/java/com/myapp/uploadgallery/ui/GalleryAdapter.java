@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
+import com.myapp.uploadgallery.util.UniqueList;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
  * Adapter for the gallery of uploaded images.
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
-    private List<UpImage> images = new ArrayList<>();
+    private List<UpImage> images = new UniqueList<>();
     private LayoutInflater inflater;
     private Context context;
 

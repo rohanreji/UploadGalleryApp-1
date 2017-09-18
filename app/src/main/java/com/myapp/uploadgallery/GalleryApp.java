@@ -7,8 +7,9 @@ import android.os.Bundle;
 import com.myapp.uploadgallery.di.AppComponent;
 import com.myapp.uploadgallery.di.AppModule;
 import com.myapp.uploadgallery.di.DaggerAppComponent;
-import com.myapp.uploadgallery.model.UserId;
+import com.myapp.uploadgallery.presenter.UserId;
 import com.myapp.uploadgallery.presenter.GalleryManager;
+import com.myapp.uploadgallery.ui.Viewable;
 
 import javax.inject.Inject;
 
@@ -47,7 +48,9 @@ public class GalleryApp extends Application implements HasActivityInjector,
 
     @Override
     public void onActivityCreated(final Activity activity, final Bundle bundle) {
-
+        if (activity instanceof Viewable) {
+            manager.setView((Viewable) activity);
+        }
     }
 
     @Override

@@ -8,7 +8,6 @@ import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
 import com.myapp.uploadgallery.model.UpImage;
-import com.myapp.uploadgallery.model.UserId;
 import com.myapp.uploadgallery.ui.Viewable;
 import com.myapp.uploadgallery.util.UniqueList;
 
@@ -35,24 +34,29 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
+    public void setView(Viewable view) {
+        this.view = view;
+    }
+
+    @Override
     public void onResume() {
         endpoint.getImagesForUser(userId.get())
                 .flatMap((ImageResponse response) -> Observable.from(response.getImages()))
                 .subscribeOn(Schedulers.io())
-                .doOnTerminate(() -> {
-                    Log.d("IMAGE", "TERMINATED!");
-                    if (images.size() == 0) {
-                        view.showStubText();
-                    } else {
-                        view.showGallery(images);
-                    }
-                })
                 .doOnNext((UpImage image) -> images.add(image))
+                .doOnError((Throwable t) -> {imagesUpdated(); t.printStackTrace();})
+                .doOnUnsubscribe(() -> imagesUpdated())
                 .subscribe(UpImage -> Log.d("Image", String.valueOf("image")));
     }
 
-    public void setView(Viewable view) {
-        this.view = view;
+    private void imagesUpdated() {
+        Log.d("IMAGE", "updated!");
+        new Exception().printStackTrace();
+        if (images.size() == 0) {
+            view.showStubText();
+        } else {
+            view.showGallery(images);
+        }
     }
 
     @Override
@@ -86,7 +90,8 @@ public class GalleryManagerImpl implements GalleryManager {
     public Observable<UpImage> uploadCachedPicture(final Context context, final File file) {
         return Observable.defer(() -> {
             RequestBody body = RequestBody.create(MediaType.parse("image/*"), file);
-            MultipartBody.Part part = MultipartBody.Part.createFormData("image", file.getName(), body);
+            MultipartBody.Part part =
+                    MultipartBody.Part.createFormData("image", file.getName(), body);
 
             return endpoint.postImageForUser(userId.get(), part)
                     .flatMap((ImageUploadResponse response) -> {

@@ -20,8 +20,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -98,23 +96,6 @@ public class MainActivity extends AppCompatActivity implements Viewable {
                     (DialogInterface dialog, int which) -> startCamera());
         }
         builder.create().show();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -228,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
 
     @Override
     public void showGallery(final UniqueList<UpImage> images) {
-        if (galleryViewable != null) {
+        if (galleryViewable == null) {
             // Create new fragment and transaction
             GalleryFragment newFragment = new GalleryFragment();
             android.support.v4.app.FragmentTransaction transaction =
@@ -236,7 +217,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack
-            transaction.replace(R.id.flFragment, newFragment, GALLERY);
+            transaction.add(R.id.flFragment, newFragment, GALLERY);
 
             // Commit the transaction
             transaction.commit();
