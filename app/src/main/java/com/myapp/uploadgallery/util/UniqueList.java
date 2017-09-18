@@ -1,6 +1,7 @@
 package com.myapp.uploadgallery.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 
 /**
@@ -22,5 +23,11 @@ public class UniqueList<T> extends ArrayList<T> {
         if (set.add(element)) {
             super.add(index, element);
         }
+    }
+
+    @Override
+    public boolean addAll(final Collection<? extends T> c) {
+        c.removeAll(set);
+        return super.addAll(c);
     }
 }

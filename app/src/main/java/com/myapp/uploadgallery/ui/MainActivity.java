@@ -15,7 +15,7 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     public static final int REQUEST_IMAGE_GALLERY = 102;
     public static final int PERMISSION_REQUEST_GALLERY = 103;
     public static final int PERMISSION_REQUEST_CAMERA = 104;
+    public static final String GALLERY = "GALLERY";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     GalleryManager galleryManager;
 
     private GalleryAdapter adapter;
+    private GalleryViewable galleryViewable;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -91,16 +93,10 @@ public class MainActivity extends AppCompatActivity implements Viewable {
                 .setMessage(R.string.dialog_upload_message)
                 .setNegativeButton(R.string.dialog_upload_gallery,
                         (DialogInterface dialog, int which) -> startGallery());
-//        if (galleryManager.hasCamera(this)) {
-//            builder.setPositiveButton(R.string.dialog_upload_camera,
-//                    new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(final DialogInterface dialogInterface,
-//                                            final int i) {
-//                            startCamera();
-//                        }
-//                    });
-//        }
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            builder.setPositiveButton(R.string.dialog_upload_camera,
+                    (DialogInterface dialog, int which) -> startCamera());
+        }
         builder.create().show();
     }
 
@@ -222,12 +218,31 @@ public class MainActivity extends AppCompatActivity implements Viewable {
 
     @Override
     public void showStubText() {
-        getFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        if (galleryViewable != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove((Fragment) galleryViewable)
+                    .commit();
+        }
     }
 
     @Override
     public void showGallery(final UniqueList<UpImage> images) {
-        // TODO: 9/18/17 show gallery
+        if (galleryViewable != null) {
+            // Create new fragment and transaction
+            GalleryFragment newFragment = new GalleryFragment();
+            android.support.v4.app.FragmentTransaction transaction =
+                    getSupportFragmentManager().beginTransaction();
+
+            // Replace whatever is in the fragment_container view with this fragment,
+            // and add the transaction to the back stack
+            transaction.replace(R.id.flFragment, newFragment, GALLERY);
+
+            // Commit the transaction
+            transaction.commit();
+            galleryViewable = newFragment;
+        }
+        galleryViewable.setImages(images);
     }
 
     public void showManipulator(Bitmap bitmap) {

@@ -31,8 +31,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         this.context = context;
     }
 
-    public void add(UpImage image) {
-        images.add(image);
+    public void setImages(List<UpImage> images) {
+        this.images.addAll(images);
         notifyDataSetChanged();
     }
 
