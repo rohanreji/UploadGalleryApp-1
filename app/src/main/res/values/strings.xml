@@ -10,4 +10,6 @@
     <string name="no_gallery_permission">To choose a photo, storage permission is required</string>
     <string name="dialog_network_title">Something went wrong</string>
     <string name="dialog_network_message">Sorry, internet connection was unsuccessful</string>
+    <string name="manipulator_save">Save</string>
+    <string name="manipulator_cancel">Cancel</string>
 </resources>
