@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
             transaction.add(R.id.flFragment, newFragment, GALLERY);
             transaction.commit();
             galleryViewable = newFragment;
-            galleryViewable.setCallback(galleryManager.getCallback());
+            galleryViewable.setCallback(galleryManager.getGalleryListener());
         }
         galleryViewable.setImages(images);
     }
@@ -251,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements Viewable {
             transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
             manipulatorViewable = newFragment;
+            manipulatorViewable.setManipulatorListener(galleryManager.getManipulatorListener());
         }
         manipulatorViewable.setBitmap(bitmap);
     }

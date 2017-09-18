@@ -25,7 +25,7 @@ import okhttp3.RequestBody;
 
 import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
 
-public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryViewableListener {
+public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private final UniqueList<GalleryImage> images;
@@ -120,7 +120,7 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public GalleryViewable.GalleryViewableListener getCallback() {
+    public GalleryViewable.GalleryListener getGalleryListener() {
         return this;
     }
 

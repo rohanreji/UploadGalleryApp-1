@@ -20,6 +20,31 @@
             android:src="@drawable/ic_save"/>
 
         <ImageView
+            android:id="@+id/ivManipulatorRotateLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_toLeftOf="@+id/center"
+            android:src="@drawable/ic_rotate_left"/>
+
+        <ImageView
+            android:id="@+id/ivManipulatorRotateRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_toRightOf="@+id/center"
+            android:src="@drawable/ic_rotate_right"/>
+
+        <View
+            android:id="@+id/center"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+
+        <ImageView
             android:id="@+id/ivManipulatorCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,8 +61,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="@dimen/border_little_margin"
             android:layout_below="@+id/ivManipulatorSave"
+            android:layout_marginTop="@dimen/border_little_margin"
             custom:scv_background_color="@color/colorPrimaryDark"
             custom:scv_crop_mode="fit_image"
             custom:scv_frame_color="@color/colorAccent"

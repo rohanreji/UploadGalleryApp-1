@@ -24,7 +24,7 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
     RecyclerView galleryView;
 
     private GalleryAdapter adapter;
-    private GalleryViewableListener listener;
+    private GalleryListener listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,7 +56,7 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
     }
 
     @Override
-    public void setCallback(final GalleryViewableListener galleryViewableListener) {
-        this.listener = galleryViewableListener;
+    public void setCallback(final GalleryListener galleryListener) {
+        this.listener = galleryListener;
     }
 }

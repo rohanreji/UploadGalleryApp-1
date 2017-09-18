@@ -12,6 +12,7 @@ import com.myapp.uploadgallery.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class ManipulatorFragment extends Fragment implements ManipulatorViewable {
     @BindView(R.id.cropImageView)
@@ -51,5 +52,32 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     @Override
     public void setManipulatorListener(final ManipulatorListener listener) {
         this.listener = listener;
+    }
+
+    @OnClick(R.id.ivManipulatorCancel)
+    public void close() {
+        if (null != listener) {
+            listener.close();
+        }
+    }
+
+    @OnClick(R.id.ivManipulatorSave)
+    public void save() {
+
+    }
+
+    @OnClick(R.id.ivManipulatorRotateLeft)
+    public void rotateLeft() {
+        if (null != image) {
+            image.rotateImage(CropImageView.RotateDegrees.ROTATE_M90D, 1000);
+        }
+    }
+
+
+    @OnClick(R.id.ivManipulatorRotateRight)
+    public void rotateRight() {
+        if (null != image) {
+            image.rotateImage(CropImageView.RotateDegrees.ROTATE_90D, 1000);
+        }
     }
 }

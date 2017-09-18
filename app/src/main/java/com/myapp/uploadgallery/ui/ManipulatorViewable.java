@@ -8,5 +8,7 @@ public interface ManipulatorViewable {
 
     interface ManipulatorListener {
         void onViewCreated();
+        void close();
+        void save();
     }
 }
