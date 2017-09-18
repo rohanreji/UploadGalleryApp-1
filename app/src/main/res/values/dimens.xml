@@ -1,5 +1,6 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="cell_margin">5dp</dimen>
-    <dimen name="border_margin">5dp</dimen>
+    <dimen name="border_margin">15dp</dimen>
+    <dimen name="border_little_margin">15dp</dimen>
 </resources>
