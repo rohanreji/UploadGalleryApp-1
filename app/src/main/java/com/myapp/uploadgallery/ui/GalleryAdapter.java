@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.model.UpImage;
+import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
 import com.squareup.picasso.Picasso;
 
@@ -49,7 +50,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 .load(image.getUrl())
                 .resize(120, 60)
                 .into(holder.cellImage);
-        holder.cellTime.setText(image.getFormattedTimestamp());
+        holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreated_at()));
     }
 
     @Override

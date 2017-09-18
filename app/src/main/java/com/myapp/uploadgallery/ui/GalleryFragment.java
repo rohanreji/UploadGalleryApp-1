@@ -1,6 +1,5 @@
 package com.myapp.uploadgallery.ui;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -31,8 +30,6 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.layout_gallery, container, false);
         ButterKnife.bind(this, view);
-
-        galleryView.setBackgroundColor(Color.BLUE);
 
         galleryView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         adapter = new GalleryAdapter(getContext());

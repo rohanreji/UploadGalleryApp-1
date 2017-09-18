@@ -8,11 +8,11 @@ import com.myapp.uploadgallery.ui.Viewable;
 
 import java.io.File;
 
+import rx.Completable;
 import rx.Observable;
 
 public interface GalleryManager {
-
-    void onResume();
+    Completable onResume();
     Observable<File> onPictureChosen(Context context, Bitmap bitmap);
     Observable<UpImage> uploadCachedPicture(Context context, File file);
     void setView(Viewable view);

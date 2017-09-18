@@ -21,6 +21,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.myapp.uploadgallery.R;
@@ -38,6 +40,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
+import rx.Observable;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements Viewable {
@@ -52,6 +55,12 @@ public class MainActivity extends AppCompatActivity implements Viewable {
 
     @BindView(R.id.fab)
     FloatingActionButton fab;
+
+    @BindView(R.id.progress)
+    ProgressBar progressBar;
+
+    @BindView(R.id.tvStub)
+    TextView emptyText;
 
     @Inject
     GalleryManager galleryManager;
@@ -102,7 +111,14 @@ public class MainActivity extends AppCompatActivity implements Viewable {
     protected void onResume() {
         super.onResume();
 
-        galleryManager.onResume();
+        galleryManager.onResume()
+                .subscribe(() -> showProgress(false));
+    }
+
+    public Observable<Void> showProgress(boolean show) {
+        progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
+        emptyText.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+        return Observable.empty();
     }
 
     public void startCamera() {
@@ -234,5 +250,15 @@ public class MainActivity extends AppCompatActivity implements Viewable {
                 .doOnError((Throwable t) -> t.printStackTrace())
                 .doOnUnsubscribe(() -> galleryManager.onResume())
                 .subscribe();
+    }
+
+    @Override
+    public Observable<Void> showNetworkAlert(final Throwable throwable) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_network_title)
+                .setMessage(R.string.dialog_network_message)
+                .setPositiveButton(android.R.string.ok, null);
+        builder.create().show();
+        return Observable.empty();
     }
 }

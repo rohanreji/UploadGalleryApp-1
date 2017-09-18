@@ -1,9 +1,5 @@
 package com.myapp.uploadgallery.model;
 
-import android.text.format.DateUtils;
-
-import java.util.Calendar;
-
 /**
  * Pojo for an image.
  */
@@ -22,11 +18,6 @@ public class UpImage {
     }
     public void setCreated_at(final long created_at) {
         this.created_at = created_at;
-    }
-
-    public CharSequence getFormattedTimestamp() {
-        return DateUtils.getRelativeTimeSpanString(created_at,
-                Calendar.getInstance().getTimeInMillis(), DateUtils.MINUTE_IN_MILLIS, 0);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.myapp.uploadgallery.presenter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
@@ -18,6 +17,7 @@ import java.io.OutputStream;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import rx.Completable;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -41,22 +41,19 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
-    public void onResume() {
-        endpoint.getImagesForUser(userId.get())
+    public Completable onResume() {
+        return endpoint.getImagesForUser(userId.get())
                 .flatMap((ImageResponse response) -> Observable.from(response.getImages()))
                 .subscribeOn(Schedulers.io())
                 .doOnNext((UpImage image) -> images.add(image))
-                .doOnError((Throwable t) -> {
-                    imagesUpdated();
-                    t.printStackTrace();
-                })
-                .doOnUnsubscribe(() -> imagesUpdated())
-                .subscribe(UpImage -> Log.d("Image", String.valueOf("image")));
+                .doOnError((Throwable t) -> view.showNetworkAlert(t))
+                .doOnCompleted(() -> imagesUpdated())
+                .doOnSubscribe(() -> view.showProgress(true))
+                .doOnUnsubscribe(() -> view.showProgress(false))
+                .toCompletable();
     }
 
     private void imagesUpdated() {
-        Log.d("IMAGE", "updated!");
-        new Exception().printStackTrace();
         if (images.size() == 0) {
             view.showStubText();
         } else {
