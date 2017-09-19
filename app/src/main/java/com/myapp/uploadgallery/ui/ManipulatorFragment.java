@@ -34,6 +34,8 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         View view = inflater.inflate(R.layout.layout_manipulator, container, false);
         ButterKnife.bind(this, view);
 
+        image.setCropMode(CropImageView.CropMode.FREE);
+
         if (null != bitmap && null != uri) {
             setBitmap(bitmap, uri);
             bitmap = null;
@@ -67,12 +69,17 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
     @OnClick(R.id.ivManipulatorSave)
     public void save() {
+        if (null != listener) {
+            listener.showProgress();
+        }
         image.cropAsSingle()
                 .flatMap(new Function<Bitmap, SingleSource<Uri>>() {
                     @Override
                     public SingleSource<Uri> apply(@io.reactivex.annotations.NonNull Bitmap bitmap)
                             throws Exception {
-                        return image.save(bitmap)
+                        image.setCompressFormat(Bitmap.CompressFormat.JPEG);
+                        return image
+                                .save(bitmap)
                                 .executeAsSingle(uri);
                     }
                 })

@@ -279,12 +279,19 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Override
     public void onSaved() {
+        close();
         showProgress(true);
         galleryManager.uploadCachedPicture(this);
     }
 
     @Override
     public void onError() {
+        showProgress(false);
+        close();
+    }
 
+    @Override
+    public void showProgress() {
+        showProgress(true);
     }
 }

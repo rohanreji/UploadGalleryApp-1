@@ -11,5 +11,6 @@ public interface ManipulatorViewable {
         void close();
         void onSaved();
         void onError();
+        void showProgress();
     }
 }
