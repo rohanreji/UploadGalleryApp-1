@@ -30,6 +30,7 @@ import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
 import com.myapp.uploadgallery.util.UniqueList;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -40,6 +41,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements Viewable,
         ManipulatorViewable.ManipulatorListener {
@@ -67,8 +69,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     private GalleryViewable galleryViewable;
     private ManipulatorViewable manipulatorViewable;
-    private boolean manipulatorCreated;
-    private boolean manipulatorVisible;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -111,7 +111,9 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     protected void onResume() {
         super.onResume();
 
-        galleryManager.onResume().subscribe();
+        if (manipulatorViewable == null) {
+            galleryManager.onResume().subscribe();
+        }
     }
 
     @Override
@@ -239,31 +241,15 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     public void showManipulator(Bitmap bitmap) {
-//        galleryManager.onPictureChosen(this, bitmap)
-//                .flatMap((File file) -> galleryManager.uploadCachedPicture(this, file))
-//                .subscribeOn(Schedulers.io())
-//                .doOnError((Throwable t) -> t.printStackTrace())
-//                .doFinally(() -> galleryManager.onResume())
-//                .subscribe();
-
-        ManipulatorFragment newFragment;
         if (manipulatorViewable == null) {
-            newFragment = new ManipulatorFragment();
-            manipulatorViewable = newFragment;
-            manipulatorCreated = true;
-            manipulatorVisible = false;
-            manipulatorViewable.setManipulatorListener(this);
-        } else {
-            newFragment = (ManipulatorFragment) manipulatorViewable;
-        }
-
-        if (manipulatorCreated && !manipulatorVisible) {
+            ManipulatorFragment newFragment = new ManipulatorFragment();
             android.support.v4.app.FragmentTransaction transaction =
                     getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.flFragment, newFragment, GALLERY);
             transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
-
+            manipulatorViewable = newFragment;
+            manipulatorViewable.setManipulatorListener(this);
         }
         manipulatorViewable.setBitmap(bitmap, galleryManager.getPictureUri(this));
     }
@@ -285,15 +271,20 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     .beginTransaction()
                     .remove((Fragment) manipulatorViewable)
                     .commit();
+            manipulatorViewable = null;
         }
-        manipulatorVisible = false;
     }
 
     @Override
-    public void onSaved() {
+    public void onCropped(Bitmap bitmap) {
         close();
         showProgress(true);
-        galleryManager.uploadCachedPicture(this);
+        galleryManager.saveBitmap(this, bitmap)
+                .flatMap((File file) -> galleryManager.uploadCachedPicture(this))
+                .subscribeOn(Schedulers.io())
+                .doOnError((Throwable t) -> t.printStackTrace())
+                .doFinally(() -> showProgress(false))
+                .subscribe();
     }
 
     @Override
@@ -307,8 +298,4 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         showProgress(true);
     }
 
-    @Override
-    public void onViewCreated() {
-        manipulatorVisible = true;
-    }
 }

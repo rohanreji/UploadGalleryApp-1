@@ -9,9 +9,8 @@ public interface ManipulatorViewable {
 
     interface ManipulatorListener {
         void close();
-        void onSaved();
+        void onCropped(Bitmap bitmap);
         void onError();
         void showProgress();
-        void onViewCreated();
     }
 }

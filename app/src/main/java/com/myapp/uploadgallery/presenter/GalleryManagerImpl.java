@@ -1,6 +1,7 @@
 package com.myapp.uploadgallery.presenter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -12,6 +13,8 @@ import com.myapp.uploadgallery.ui.Viewable;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -78,6 +81,29 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
+    public Observable<File> saveBitmap(final Context context, final Bitmap bitmap) {
+        return Observable.defer(() -> {
+            File file = getPictureFile(context);
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return Observable.just(file);
+        });
+    }
+
+    @Override
     public Observable<GalleryImage> uploadCachedPicture(final Context context) {
         return Observable.defer(() -> {
             final File pictureFile = getPictureFile(context);
@@ -88,7 +114,12 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                             body);
 
             return endpoint.postImageForUser(userId.get(), part)
-                    .flatMap((GalleryImage response) -> Observable.just(response));
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .flatMap((GalleryImage response) -> {
+                        images.add(response);
+                        imagesUpdated();
+                        return Observable.empty();
+                    });
         });
     }
 

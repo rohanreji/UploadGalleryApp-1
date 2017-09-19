@@ -14,10 +14,8 @@ import com.myapp.uploadgallery.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class ManipulatorFragment extends Fragment implements ManipulatorViewable {
@@ -40,10 +38,6 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         if (null != bitmap && null != uri) {
             setBitmap(bitmap, uri);
             bitmap = null;
-        }
-
-        if (listener != null) {
-            listener.onViewCreated();
         }
 
         return view;
@@ -78,23 +72,13 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
             listener.showProgress();
         }
         image.cropAsSingle()
-                .flatMap(new Function<Bitmap, SingleSource<Uri>>() {
-                    @Override
-                    public SingleSource<Uri> apply(@io.reactivex.annotations.NonNull Bitmap bitmap)
-                            throws Exception {
-                        image.setCompressFormat(Bitmap.CompressFormat.JPEG);
-                        return image
-                                .save(bitmap)
-                                .executeAsSingle(uri);
-                    }
-                })
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Uri>() {
+                .subscribe(new Consumer<Bitmap>() {
                     @Override
-                    public void accept(@io.reactivex.annotations.NonNull Uri uri) throws Exception {
+                    public void accept(@io.reactivex.annotations.NonNull Bitmap bitmap) throws Exception {
                         if (null != listener) {
-                            listener.onSaved();
+                            listener.onCropped(bitmap);
                         }
                     }
                 }, new Consumer<Throwable>() {
