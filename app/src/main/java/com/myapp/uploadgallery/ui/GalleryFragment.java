@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.myapp.uploadgallery.R;
-import com.myapp.uploadgallery.model.GalleryImage;
+import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import butterknife.BindView;

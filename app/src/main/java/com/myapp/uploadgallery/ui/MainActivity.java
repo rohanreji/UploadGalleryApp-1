@@ -26,7 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.myapp.uploadgallery.R;
-import com.myapp.uploadgallery.model.GalleryImage;
+import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.presenter.GalleryManager;
 import com.myapp.uploadgallery.util.UniqueList;
 
@@ -278,7 +278,13 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     @Override
-    public void save() {
+    public void onSaved() {
+        showProgress(true);
+        galleryManager.uploadCachedPicture(this);
+    }
+
+    @Override
+    public void onError() {
 
     }
 }

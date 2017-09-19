@@ -1,22 +1,17 @@
 package com.myapp.uploadgallery.presenter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
+import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.api.ImageResponse;
-import com.myapp.uploadgallery.api.ImageUploadResponse;
-import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.ui.GalleryViewable;
-import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
-import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,9 +20,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
-import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
-
-public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener{
+public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private final UniqueList<GalleryImage> images;
@@ -52,14 +45,10 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                         imageResponse.getImages()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext((ImageUploadResponse iur) -> view.showProgress(true))
-                .doOnNext((ImageUploadResponse image) -> {
+                .doOnNext((GalleryImage iur) -> view.showProgress(true))
+                .doOnNext((GalleryImage image) -> {
                     view.showProgress(true);
-                    GalleryImage galleryImage = new GalleryImage();
-                    galleryImage.setCreated_at(
-                            DateFormatUtils.parseTime(image.getCreatedAt()));
-                    galleryImage.setUrl(galleryImage.getUrl());
-                    images.add(galleryImage);
+                    images.add(image);
                 })
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
                 .doOnComplete(() -> {
@@ -77,57 +66,29 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public Observable<File> onPictureChosen(Context context, Bitmap bitmap) {
-        String name = "cached_bitmap.jpg";
-        return Observable.defer(() -> {
-            File file = new File(context.getCacheDir(), name);
-            if (file.exists()) {
-                file.delete();
-            }
-            OutputStream out = null;
-            try {
-                out = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            return Observable.just(file);
-        });
-    }
-
-    @Override
     public Uri getPictureUri(Context context) {
-        String name = "cached_bitmap.jpg";
-        File file = new File(context.getCacheDir(), name);
-        if (file.exists()) {
-            file.delete();
-        }
+        File file = getPictureFile(context);
         return Uri.fromFile(file);
     }
 
+    @NonNull
+    private File getPictureFile(final Context context) {
+        String name = "cached_bitmap.jpg";
+        return new File(context.getCacheDir(), name);
+    }
+
     @Override
-    public Observable<GalleryImage> uploadCachedPicture(final Context context, final File file) {
+    public Observable<GalleryImage> uploadCachedPicture(final Context context) {
         return Observable.defer(() -> {
-            RequestBody body = RequestBody.create(MediaType.parse("image/*"), file);
+            final File pictureFile = getPictureFile(context);
+            RequestBody body =
+                    RequestBody.create(MediaType.parse("image/*"), pictureFile);
             MultipartBody.Part part =
-                    MultipartBody.Part.createFormData("image", file.getName(), body);
+                    MultipartBody.Part.createFormData("image", pictureFile.getName(),
+                            body);
 
             return endpoint.postImageForUser(userId.get(), part)
-                    .flatMap((ImageUploadResponse response) -> {
-                        GalleryImage galleryImage = new GalleryImage();
-                        galleryImage.setUrl(response.getUrl());
-                        long time = parseTime(response.getCreatedAt());
-                        galleryImage.setCreated_at(time);
-                        return Observable.just(galleryImage);
-                    });
+                    .flatMap((GalleryImage response) -> Observable.just(response));
         });
     }
 
@@ -141,6 +102,4 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
         imagesUpdated();
         view.showProgress(false);
     }
-
-
 }

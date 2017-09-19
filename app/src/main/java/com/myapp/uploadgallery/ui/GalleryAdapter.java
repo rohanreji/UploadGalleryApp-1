@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.myapp.uploadgallery.R;
-import com.myapp.uploadgallery.model.GalleryImage;
+import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
 import com.squareup.picasso.Picasso;
@@ -44,7 +44,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 .centerInside()
                 .error(R.drawable.ic_image)
                 .into(holder.cellImage);
-        holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreated_at()));
+        holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreatedAtTimestamp()));
     }
 
     @Override

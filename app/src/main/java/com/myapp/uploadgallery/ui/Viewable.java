@@ -1,6 +1,6 @@
 package com.myapp.uploadgallery.ui;
 
-import com.myapp.uploadgallery.model.GalleryImage;
+import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import io.reactivex.Observable;

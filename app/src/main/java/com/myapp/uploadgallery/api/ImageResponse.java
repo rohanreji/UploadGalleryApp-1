@@ -6,9 +6,9 @@ import java.util.ArrayList;
 
 public class ImageResponse {
     @Expose
-    ArrayList<ImageUploadResponse> images;
+    ArrayList<GalleryImage> images;
 
-    public ArrayList<ImageUploadResponse> getImages() {
+    public ArrayList<GalleryImage> getImages() {
         return images;
     }
 }

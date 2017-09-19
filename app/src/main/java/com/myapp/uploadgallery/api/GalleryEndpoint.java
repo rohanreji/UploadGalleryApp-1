@@ -16,7 +16,7 @@ public interface GalleryEndpoint {
 
     @Multipart
     @POST("images/{userId}")
-    Observable<ImageUploadResponse> postImageForUser(
+    Observable<GalleryImage> postImageForUser(
             @Path("userId") String userId,
             @Part MultipartBody.Part image);
 }
