@@ -40,7 +40,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         image.setDebug(true);
 
         if (null != bitmap) {
-            setBitmap(bitmap);
+            setBitmapToManipulate(bitmap);
             bitmap = null;
         }
 
@@ -48,7 +48,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     }
 
     @Override
-    public void setBitmap(final Bitmap bitmap) {
+    public void setBitmapToManipulate(final Bitmap bitmap) {
         if (null != image) {
             image.setLoggingEnabled(true);
             image.setImageBitmap(bitmap);
@@ -67,7 +67,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     @OnClick(R.id.ivManipulatorCancel)
     public void close() {
         if (null != uilistener) {
-            uilistener.close();
+            uilistener.closeManipulator();
         }
     }
 
@@ -82,10 +82,10 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                     public void accept(@io.reactivex.annotations.NonNull Bitmap bitmap) throws
                             Exception {
                         if (null != uilistener) {
-                            uilistener.close();
+                            uilistener.closeManipulator();
                         }
                         if (null != listener) {
-                            listener.onCropped(getPictureFile(getContext()), bitmap);
+                            listener.onManipulatorCropped(getPictureFile(getContext()), bitmap);
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -93,7 +93,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                     public void accept(@io.reactivex.annotations.NonNull Throwable throwable)
                             throws Exception {
                         if (null != uilistener) {
-                            uilistener.onError();
+                            uilistener.onManipulationError();
                         }
                     }
                 });

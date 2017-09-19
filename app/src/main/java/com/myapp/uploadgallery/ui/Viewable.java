@@ -10,4 +10,5 @@ public interface Viewable {
     void showGallery(UniqueList<GalleryImage> images);
     Observable<Void> showProgress(boolean show);
     Observable<Void> showNetworkAlert(Throwable throwable);
+    Observable<Void> showUploadAlert(Throwable throwable);
 }

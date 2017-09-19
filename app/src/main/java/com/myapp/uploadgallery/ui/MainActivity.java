@@ -252,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             manipulatorViewable.setManipulatorListeners(galleryManager.getManipulatorListener(),
                     this);
         }
-        manipulatorViewable.setBitmap(bitmap);
+        manipulatorViewable.setBitmapToManipulate(bitmap);
         showFab(false);
     }
 
@@ -267,7 +267,16 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     @Override
-    public void close() {
+    public Observable<Void> showUploadAlert(final Throwable throwable) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_manipulation_title)
+                .setMessage(R.string.dialog_manipulation_message)
+                .setPositiveButton(android.R.string.ok, null);
+        builder.create().show();
+        return Observable.empty();
+    }
+    @Override
+    public void closeManipulator() {
         if (manipulatorViewable != null) {
             getSupportFragmentManager()
                     .beginTransaction()
@@ -278,23 +287,10 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         showFab(true);
     }
 
-//    @Override
-//    public void onCropped(Bitmap bitmap) {
-//        close();
-//        showProgress(true);
-//        final File pictureFile = getPictureFile(this);
-//        galleryManager.saveBitmap(pictureFile, bitmap)
-//                .flatMap((File file) -> galleryManager.uploadCachedPicture(pictureFile))
-//                .subscribeOn(Schedulers.io())
-//                .doOnError((Throwable t) -> t.printStackTrace())
-//                .doFinally(() -> showProgress(false))
-//                .subscribe();
-//    }
-
     @Override
-    public void onError() {
+    public void onManipulationError() {
         showProgress(false);
-        close();
+        closeManipulator();
     }
 
     private void showFab(boolean show) {

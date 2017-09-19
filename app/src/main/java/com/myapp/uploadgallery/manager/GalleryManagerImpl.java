@@ -124,7 +124,13 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public void onCropped(final Bitmap bitmap) {
-
+    public void onManipulatorCropped(final File pictureFile, final Bitmap bitmap) {
+        saveBitmap(pictureFile, bitmap)
+                .flatMap((File file) -> uploadCachedPicture(file))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError((Throwable t) -> view.showUploadAlert(t))
+                .doFinally(() -> view.showProgress(false))
+                .subscribe();
     }
 }
