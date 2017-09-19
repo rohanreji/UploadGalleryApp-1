@@ -252,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             manipulatorViewable.setManipulatorListener(this);
         }
         manipulatorViewable.setBitmap(bitmap, galleryManager.getPictureUri(this));
+        showFab(false);
     }
 
     @Override
@@ -273,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     .commit();
             manipulatorViewable = null;
         }
+        showFab(true);
     }
 
     @Override
@@ -298,4 +300,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         showProgress(true);
     }
 
+    private void showFab(boolean show) {
+        fab.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
 }
