@@ -1,35 +1,37 @@
 package com.myapp.uploadgallery.di;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.myapp.uploadgallery.MockGalleryApp;
-
-import org.mockito.Mockito;
-
-import javax.inject.Singleton;
+import com.myapp.uploadgallery.GalleryApp;
 
 import dagger.Module;
-import dagger.Provides;
-
 
 @Module
-public class MockAppModule  {
-    private final MockGalleryApp app;
+public class MockAppModule extends AppModule {
 
-    public MockAppModule(final MockGalleryApp application) {
-        this.app = application;
+    public MockAppModule(final GalleryApp application) {
+        super(application);
     }
-
-    @Singleton
-    @Provides
-    Context provideApplicationContext() {
-        return app;
-    }
-
-    @Provides
-    @Singleton
-    SharedPreferences provideSharedPrefs() {
-        return Mockito.mock(SharedPreferences.class);
-    }
+//
+//    @Override
+//    Context provideContext() {
+//        return Mockito.mock(Context.class);
+//    }
+//    @Override
+//    GalleryEndpoint provideGalleryEndpoint(final Gson gson) {
+//        return Mockito.mock(GalleryEndpoint.class);
+//    }
+//
+//    @Override
+//    UserId provideUserId() {
+//        return Mockito.mock(UserId.class);
+//    }
+//
+//    @Override
+//    Gson provideGson() {
+//        return Mockito.mock(Gson.class);
+//    }
+//
+//    @Override
+//    GalleryManager provideGalleryManager(final GalleryEndpoint endpoint, final UserId userId) {
+//        return Mockito.mock(GalleryManager.class);
+//    }
 }
