@@ -7,9 +7,9 @@ import com.google.gson.GsonBuilder;
 import com.myapp.uploadgallery.BuildConfig;
 import com.myapp.uploadgallery.GalleryApp;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
-import com.myapp.uploadgallery.presenter.UserId;
-import com.myapp.uploadgallery.presenter.GalleryManager;
-import com.myapp.uploadgallery.presenter.GalleryManagerImpl;
+import com.myapp.uploadgallery.manager.UserId;
+import com.myapp.uploadgallery.manager.GalleryManager;
+import com.myapp.uploadgallery.manager.GalleryManagerImpl;
 
 import javax.inject.Singleton;
 

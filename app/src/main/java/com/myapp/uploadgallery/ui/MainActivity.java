@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
-import com.myapp.uploadgallery.presenter.GalleryManager;
+import com.myapp.uploadgallery.manager.GalleryManager;
 import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;

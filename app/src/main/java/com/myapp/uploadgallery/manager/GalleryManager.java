@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.presenter;
+package com.myapp.uploadgallery.manager;
 
 import android.content.Context;
 import android.graphics.Bitmap;
