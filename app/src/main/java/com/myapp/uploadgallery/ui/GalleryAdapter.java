@@ -62,8 +62,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.ivCellImage)
         ImageView cellImage;
+
         @BindView(R.id.tvCellTime)
         TextView cellTime;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);

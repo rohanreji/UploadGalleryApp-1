@@ -30,7 +30,6 @@ import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
 import com.myapp.uploadgallery.util.UniqueList;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -41,13 +40,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
-
-import static com.myapp.uploadgallery.util.FileUtils.getPictureFile;
-import static com.myapp.uploadgallery.util.FileUtils.getPictureUri;
 
 public class MainActivity extends AppCompatActivity implements Viewable,
-        ManipulatorViewable.ManipulatorListener {
+        ManipulatorViewable.ManipulatorUiListener {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
     public static final int REQUEST_IMAGE_GALLERY = 102;
     public static final int PERMISSION_REQUEST_GALLERY = 103;
@@ -254,9 +249,10 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
             manipulatorViewable = newFragment;
-            manipulatorViewable.setManipulatorListener(this);
+            manipulatorViewable.setManipulatorListeners(galleryManager.getManipulatorListener(),
+                    this);
         }
-        manipulatorViewable.setBitmap(bitmap, getPictureUri(this));
+        manipulatorViewable.setBitmap(bitmap);
         showFab(false);
     }
 
@@ -282,28 +278,23 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         showFab(true);
     }
 
-    @Override
-    public void onCropped(Bitmap bitmap) {
-        close();
-        showProgress(true);
-        final File pictureFile = getPictureFile(this);
-        galleryManager.saveBitmap(pictureFile, bitmap)
-                .flatMap((File file) -> galleryManager.uploadCachedPicture(pictureFile))
-                .subscribeOn(Schedulers.io())
-                .doOnError((Throwable t) -> t.printStackTrace())
-                .doFinally(() -> showProgress(false))
-                .subscribe();
-    }
+//    @Override
+//    public void onCropped(Bitmap bitmap) {
+//        close();
+//        showProgress(true);
+//        final File pictureFile = getPictureFile(this);
+//        galleryManager.saveBitmap(pictureFile, bitmap)
+//                .flatMap((File file) -> galleryManager.uploadCachedPicture(pictureFile))
+//                .subscribeOn(Schedulers.io())
+//                .doOnError((Throwable t) -> t.printStackTrace())
+//                .doFinally(() -> showProgress(false))
+//                .subscribe();
+//    }
 
     @Override
     public void onError() {
         showProgress(false);
         close();
-    }
-
-    @Override
-    public void showProgress() {
-        showProgress(true);
     }
 
     private void showFab(boolean show) {

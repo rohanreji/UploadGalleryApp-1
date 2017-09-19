@@ -1,7 +1,6 @@
 package com.myapp.uploadgallery.ui;
 
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,13 +17,18 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.myapp.uploadgallery.util.FileUtils.getPictureFile;
+
 public class ManipulatorFragment extends Fragment implements ManipulatorViewable {
     @BindView(R.id.cropImageView)
     CropImageView image;
 
+    @BindView(R.id.progress)
+    View progress;
+
     private ManipulatorListener listener;
+    private ManipulatorUiListener uilistener;
     private Bitmap bitmap;
-    private Uri uri;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -35,8 +39,8 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         image.setCropMode(CropImageView.CropMode.FREE);
         image.setDebug(true);
 
-        if (null != bitmap && null != uri) {
-            setBitmap(bitmap, uri);
+        if (null != bitmap) {
+            setBitmap(bitmap);
             bitmap = null;
         }
 
@@ -44,49 +48,52 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     }
 
     @Override
-    public void setBitmap(final Bitmap bitmap, final Uri toSave) {
+    public void setBitmap(final Bitmap bitmap) {
         if (null != image) {
             image.setLoggingEnabled(true);
             image.setImageBitmap(bitmap);
         } else {
             this.bitmap = bitmap;
         }
-        this.uri = toSave;
     }
 
     @Override
-    public void setManipulatorListener(final ManipulatorListener listener) {
+    public void setManipulatorListeners(final ManipulatorListener listener,
+                                        final ManipulatorUiListener uilistener) {
         this.listener = listener;
+        this.uilistener = uilistener;
     }
 
     @OnClick(R.id.ivManipulatorCancel)
     public void close() {
-        if (null != listener) {
-            listener.close();
+        if (null != uilistener) {
+            uilistener.close();
         }
     }
 
     @OnClick(R.id.ivManipulatorSave)
     public void save() {
-        if (null != listener) {
-            listener.showProgress();
-        }
+        progress.setVisibility(View.VISIBLE);
         image.cropAsSingle()
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<Bitmap>() {
                     @Override
-                    public void accept(@io.reactivex.annotations.NonNull Bitmap bitmap) throws Exception {
+                    public void accept(@io.reactivex.annotations.NonNull Bitmap bitmap) throws
+                            Exception {
+                        if (null != uilistener) {
+                            uilistener.close();
+                        }
                         if (null != listener) {
-                            listener.onCropped(bitmap);
+                            listener.onCropped(getPictureFile(getContext()), bitmap);
                         }
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull Throwable throwable)
                             throws Exception {
-                        if (null != listener) {
-                            listener.onError();
+                        if (null != uilistener) {
+                            uilistener.onError();
                         }
                     }
                 });

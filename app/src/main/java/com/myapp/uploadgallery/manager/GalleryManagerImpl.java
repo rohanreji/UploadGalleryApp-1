@@ -6,6 +6,7 @@ import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.ui.GalleryViewable;
+import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
 import com.myapp.uploadgallery.util.UniqueList;
 
@@ -20,7 +21,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
-public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener {
+public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener,
+        ManipulatorViewable.ManipulatorListener {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private final UniqueList<GalleryImage> images;
@@ -114,5 +116,15 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     public void onViewCreated() {
         imagesUpdated();
         view.showProgress(false);
+    }
+
+    @Override
+    public ManipulatorViewable.ManipulatorListener getManipulatorListener() {
+        return this;
+    }
+
+    @Override
+    public void onCropped(final Bitmap bitmap) {
+
     }
 }

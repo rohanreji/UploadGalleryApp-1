@@ -15,16 +15,8 @@ public class GalleryImage {
         return url;
     }
 
-    public void setUrl(final String url) {
-        this.url = url;
-    }
-
     public String getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(final String createdAt) {
-        this.createdAt = createdAt;
     }
 
     @Override
