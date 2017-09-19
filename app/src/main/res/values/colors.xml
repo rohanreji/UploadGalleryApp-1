@@ -2,8 +2,9 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimaryDarkAndTransparent">#C0303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="dimmed">#f0F0F0F0</color>
+    <color name="dimmed">#c00с0с0с</color>
     <color name="overlay">#0fFAFAFA</color>
     <color name="windowBackground">#FFF</color>
 </resources>

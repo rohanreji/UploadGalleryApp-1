@@ -3,4 +3,5 @@
     <dimen name="cell_margin">5dp</dimen>
     <dimen name="border_margin">15dp</dimen>
     <dimen name="border_little_margin">15dp</dimen>
+    <dimen name="padding_little">5dp</dimen>
 </resources>

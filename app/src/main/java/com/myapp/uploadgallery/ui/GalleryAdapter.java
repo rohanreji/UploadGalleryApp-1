@@ -41,7 +41,9 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         final Picasso picasso = Picasso.with(holder.cellImage.getContext());
         picasso.setLoggingEnabled(true);
         picasso.load(image.getUrl())
-                .error(R.drawable.ic_image)
+                .placeholder(R.drawable.ic_image)
+                .resize(800, 800)
+                .centerInside()
                 .into(holder.cellImage);
         holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreatedAtTimestamp()));
     }
