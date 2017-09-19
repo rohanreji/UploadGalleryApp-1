@@ -1,8 +1,6 @@
 package com.myapp.uploadgallery.manager;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.ui.GalleryViewable;
@@ -14,9 +12,8 @@ import io.reactivex.Observable;
 
 public interface GalleryManager {
     Observable updateImages();
-    Observable<GalleryImage> uploadCachedPicture(Context context);
+    Observable<GalleryImage> uploadCachedPicture(File file);
     void setView(Viewable view);
     GalleryViewable.GalleryListener getGalleryListener();
-    Uri getPictureUri(Context context);
-    Observable<File> saveBitmap(final Context context, final Bitmap bitmap);
+    Observable<File> saveBitmap(final File file, final Bitmap bitmap);
 }

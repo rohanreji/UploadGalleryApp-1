@@ -1,9 +1,6 @@
 package com.myapp.uploadgallery.manager;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
-import android.support.annotation.NonNull;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
@@ -68,21 +65,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public Uri getPictureUri(Context context) {
-        File file = getPictureFile(context);
-        return Uri.fromFile(file);
-    }
-
-    @NonNull
-    private File getPictureFile(final Context context) {
-        String name = "cached_bitmap.jpg";
-        return new File(context.getCacheDir(), name);
-    }
-
-    @Override
-    public Observable<File> saveBitmap(final Context context, final Bitmap bitmap) {
+    public Observable<File> saveBitmap(final File file, final Bitmap bitmap) {
         return Observable.defer(() -> {
-            File file = getPictureFile(context);
             OutputStream out = null;
             try {
                 out = new FileOutputStream(file);
@@ -103,9 +87,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public Observable<GalleryImage> uploadCachedPicture(final Context context) {
+    public Observable<GalleryImage> uploadCachedPicture(final File pictureFile) {
         return Observable.defer(() -> {
-            final File pictureFile = getPictureFile(context);
             RequestBody body =
                     RequestBody.create(MediaType.parse("image/*"), pictureFile);
             MultipartBody.Part part =

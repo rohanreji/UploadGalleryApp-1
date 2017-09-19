@@ -43,6 +43,9 @@ import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
+import static com.myapp.uploadgallery.util.FileUtils.getPictureFile;
+import static com.myapp.uploadgallery.util.FileUtils.getPictureUri;
+
 public class MainActivity extends AppCompatActivity implements Viewable,
         ManipulatorViewable.ManipulatorListener {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
@@ -253,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             manipulatorViewable = newFragment;
             manipulatorViewable.setManipulatorListener(this);
         }
-        manipulatorViewable.setBitmap(bitmap, galleryManager.getPictureUri(this));
+        manipulatorViewable.setBitmap(bitmap, getPictureUri(this));
         showFab(false);
     }
 
@@ -283,8 +286,9 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     public void onCropped(Bitmap bitmap) {
         close();
         showProgress(true);
-        galleryManager.saveBitmap(this, bitmap)
-                .flatMap((File file) -> galleryManager.uploadCachedPicture(this))
+        final File pictureFile = getPictureFile(this);
+        galleryManager.saveBitmap(pictureFile, bitmap)
+                .flatMap((File file) -> galleryManager.uploadCachedPicture(pictureFile))
                 .subscribeOn(Schedulers.io())
                 .doOnError((Throwable t) -> t.printStackTrace())
                 .doFinally(() -> showProgress(false))
