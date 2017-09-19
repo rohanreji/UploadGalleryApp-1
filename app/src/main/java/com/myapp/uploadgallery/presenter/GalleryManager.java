@@ -2,10 +2,10 @@ package com.myapp.uploadgallery.presenter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.ui.GalleryViewable;
-import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
 
 import java.io.File;
@@ -18,5 +18,5 @@ public interface GalleryManager {
     Observable<GalleryImage> uploadCachedPicture(Context context, File file);
     void setView(Viewable view);
     GalleryViewable.GalleryListener getGalleryListener();
-    ManipulatorViewable.ManipulatorListener getManipulatorListener();
+    Uri getPictureUri(Context context);
 }

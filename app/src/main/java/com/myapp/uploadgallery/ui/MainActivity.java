@@ -41,7 +41,8 @@ import butterknife.OnClick;
 import dagger.android.AndroidInjection;
 import io.reactivex.Observable;
 
-public class MainActivity extends AppCompatActivity implements Viewable {
+public class MainActivity extends AppCompatActivity implements Viewable,
+        ManipulatorViewable.ManipulatorListener {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
     public static final int REQUEST_IMAGE_GALLERY = 102;
     public static final int PERMISSION_REQUEST_GALLERY = 103;
@@ -251,9 +252,9 @@ public class MainActivity extends AppCompatActivity implements Viewable {
             transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
             manipulatorViewable = newFragment;
-            manipulatorViewable.setManipulatorListener(galleryManager.getManipulatorListener());
+            manipulatorViewable.setManipulatorListener(this);
         }
-        manipulatorViewable.setBitmap(bitmap);
+        manipulatorViewable.setBitmap(bitmap, galleryManager.getPictureUri(this));
     }
 
     @Override
@@ -264,5 +265,20 @@ public class MainActivity extends AppCompatActivity implements Viewable {
                 .setPositiveButton(android.R.string.ok, null);
         builder.create().show();
         return Observable.empty();
+    }
+
+    @Override
+    public void close() {
+        if (manipulatorViewable != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove((Fragment) manipulatorViewable)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void save() {
+
     }
 }

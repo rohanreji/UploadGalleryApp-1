@@ -1,6 +1,7 @@
 package com.myapp.uploadgallery.ui;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +14,11 @@ import com.myapp.uploadgallery.R;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.SingleSource;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 public class ManipulatorFragment extends Fragment implements ManipulatorViewable {
     @BindView(R.id.cropImageView)
@@ -20,6 +26,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
     private ManipulatorListener listener;
     private Bitmap bitmap;
+    private Uri uri;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -27,12 +34,8 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         View view = inflater.inflate(R.layout.layout_manipulator, container, false);
         ButterKnife.bind(this, view);
 
-        if (null != listener) {
-            listener.onViewCreated();
-        }
-
-        if (null != bitmap) {
-            setBitmap(bitmap);
+        if (null != bitmap && null != uri) {
+            setBitmap(bitmap, uri);
             bitmap = null;
         }
 
@@ -40,13 +43,14 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     }
 
     @Override
-    public void setBitmap(final Bitmap bitmap) {
+    public void setBitmap(final Bitmap bitmap, final Uri toSave) {
         if (null != image) {
             image.setLoggingEnabled(true);
             image.setImageBitmap(bitmap);
         } else {
             this.bitmap = bitmap;
         }
+        this.uri = toSave;
     }
 
     @Override
@@ -63,7 +67,33 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
     @OnClick(R.id.ivManipulatorSave)
     public void save() {
-
+        image.cropAsSingle()
+                .flatMap(new Function<Bitmap, SingleSource<Uri>>() {
+                    @Override
+                    public SingleSource<Uri> apply(@io.reactivex.annotations.NonNull Bitmap bitmap)
+                            throws Exception {
+                        return image.save(bitmap)
+                                .executeAsSingle(uri);
+                    }
+                })
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Uri>() {
+                    @Override
+                    public void accept(@io.reactivex.annotations.NonNull Uri uri) throws Exception {
+                        if (null != listener) {
+                            listener.onSaved();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@io.reactivex.annotations.NonNull Throwable throwable)
+                            throws Exception {
+                        if (null != listener) {
+                            listener.onError();
+                        }
+                    }
+                });
     }
 
     @OnClick(R.id.ivManipulatorRotateLeft)
@@ -72,7 +102,6 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
             image.rotateImage(CropImageView.RotateDegrees.ROTATE_M90D, 1000);
         }
     }
-
 
     @OnClick(R.id.ivManipulatorRotateRight)
     public void rotateRight() {

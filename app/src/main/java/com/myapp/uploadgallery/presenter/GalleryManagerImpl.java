@@ -2,12 +2,14 @@ package com.myapp.uploadgallery.presenter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.api.ImageUploadResponse;
 import com.myapp.uploadgallery.model.GalleryImage;
 import com.myapp.uploadgallery.ui.GalleryViewable;
+import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
 import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.myapp.uploadgallery.util.UniqueList;
@@ -25,7 +27,7 @@ import okhttp3.RequestBody;
 
 import static com.myapp.uploadgallery.util.DateFormatUtils.parseTime;
 
-public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener {
+public class GalleryManagerImpl implements GalleryManager, GalleryViewable.GalleryListener{
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private final UniqueList<GalleryImage> images;
@@ -102,6 +104,16 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
+    public Uri getPictureUri(Context context) {
+        String name = "cached_bitmap.jpg";
+        File file = new File(context.getCacheDir(), name);
+        if (file.exists()) {
+            file.delete();
+        }
+        return Uri.fromFile(file);
+    }
+
+    @Override
     public Observable<GalleryImage> uploadCachedPicture(final Context context, final File file) {
         return Observable.defer(() -> {
             RequestBody body = RequestBody.create(MediaType.parse("image/*"), file);
@@ -129,4 +141,6 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
         imagesUpdated();
         view.showProgress(false);
     }
+
+
 }
