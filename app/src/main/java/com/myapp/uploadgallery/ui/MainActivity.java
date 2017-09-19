@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     private GalleryViewable galleryViewable;
     private ManipulatorViewable manipulatorViewable;
+    private boolean manipulatorCreated;
+    private boolean manipulatorVisible;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -244,15 +246,24 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 //                .doFinally(() -> galleryManager.onResume())
 //                .subscribe();
 
+        ManipulatorFragment newFragment;
         if (manipulatorViewable == null) {
-            ManipulatorFragment newFragment = new ManipulatorFragment();
+            newFragment = new ManipulatorFragment();
+            manipulatorViewable = newFragment;
+            manipulatorCreated = true;
+            manipulatorVisible = false;
+            manipulatorViewable.setManipulatorListener(this);
+        } else {
+            newFragment = (ManipulatorFragment) manipulatorViewable;
+        }
+
+        if (manipulatorCreated && !manipulatorVisible) {
             android.support.v4.app.FragmentTransaction transaction =
                     getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.flFragment, newFragment, GALLERY);
             transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
-            manipulatorViewable = newFragment;
-            manipulatorViewable.setManipulatorListener(this);
+
         }
         manipulatorViewable.setBitmap(bitmap, galleryManager.getPictureUri(this));
     }
@@ -275,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     .remove((Fragment) manipulatorViewable)
                     .commit();
         }
+        manipulatorVisible = false;
     }
 
     @Override
@@ -293,5 +305,10 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     public void showProgress() {
         showProgress(true);
+    }
+
+    @Override
+    public void onViewCreated() {
+        manipulatorVisible = true;
     }
 }

@@ -35,10 +35,15 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         ButterKnife.bind(this, view);
 
         image.setCropMode(CropImageView.CropMode.FREE);
+        image.setDebug(true);
 
         if (null != bitmap && null != uri) {
             setBitmap(bitmap, uri);
             bitmap = null;
+        }
+
+        if (listener != null) {
+            listener.onViewCreated();
         }
 
         return view;
