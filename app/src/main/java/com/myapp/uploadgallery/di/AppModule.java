@@ -21,6 +21,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public class AppModule {
+    private static final String PREF_NAME = "GALLERY_USER_ID";
     private GalleryApp application;
 
     public AppModule(GalleryApp application) {
@@ -36,7 +37,7 @@ public class AppModule {
     @Provides
     @Singleton
     UserId provideUserId() {
-        return new UserId(application);
+        return new UserId(application.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE));
     }
 
     @Provides

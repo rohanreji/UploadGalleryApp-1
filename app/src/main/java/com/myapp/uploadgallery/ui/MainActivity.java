@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     public Observable<Void> showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
-        emptyText.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
         return Observable.empty();
     }
 
@@ -223,6 +222,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     .commit();
             galleryViewable = null;
         }
+        emptyText.setVisibility(View.VISIBLE);
     }
 
     @Override
