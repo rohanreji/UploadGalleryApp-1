@@ -1,7 +1,6 @@
 package com.myapp.uploadgallery.manager;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
@@ -34,7 +33,6 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
         this.userId = userId;
         this.endpoint = endpoint;
         images = new TreeSet<GalleryImage>();
-        Log.i("IMAGES", String.valueOf(images.hashCode()));
     }
 
     @Override
@@ -46,9 +44,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     public Observable updateImages() {
         view.showProgress(true);
         return endpoint.getImagesForUser(userId.get())
-                .flatMap((ImageResponse imageResponse) -> {
-                    return Observable.just(images.addAll(imageResponse.getImages()));
-                })
+                .flatMap((ImageResponse imageResponse) ->
+                        Observable.just(images.addAll(imageResponse.getImages())))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
@@ -60,8 +57,6 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     private void imagesUpdated() {
-        Log.i("IMAGES", "size: " + String.valueOf(images.size()));
-        Log.i("IMAGES", String.valueOf(images.hashCode()));
         if (images.size() == 0) {
             view.showProgress(false);
             view.showStubText();
