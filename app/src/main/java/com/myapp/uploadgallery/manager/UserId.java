@@ -8,7 +8,7 @@ import java.util.UUID;
  * Unique identifier for each user install.
  */
 public class UserId {
-    private static final String USER_ID = "GALLERY_USER_ID";
+    static final String USER_ID = "GALLERY_USER_ID";
 
     private String userId;
 
