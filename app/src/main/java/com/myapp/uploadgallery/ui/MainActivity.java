@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         super.onStart();
 
         if (manipulatorViewable == null) {
-            galleryManager.updateImages().subscribe();
+//            galleryManager.updateImages().subscribe();
         }
     }
 

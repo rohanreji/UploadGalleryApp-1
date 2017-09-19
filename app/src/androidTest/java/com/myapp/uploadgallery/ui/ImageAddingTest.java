@@ -7,6 +7,8 @@ import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.test.espresso.Espresso;
+import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
@@ -14,6 +16,7 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.myapp.uploadgallery.R;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +36,8 @@ import static android.support.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 @LargeTest
 public class ImageAddingTest {
+    private IdlingResource mIdlingResource;
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(
             MainActivity.class);
@@ -104,5 +109,12 @@ public class ImageAddingTest {
 
         //click cancel
         onView(withId(R.id.ivManipulatorCancel)).perform(click());
+    }
+
+    @After
+    public void unregisterIdlingResource() {
+        if (mIdlingResource != null) {
+            Espresso.unregisterIdlingResources(mIdlingResource);
+        }
     }
 }
