@@ -108,11 +108,11 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
 
         if (manipulatorViewable == null) {
-            galleryManager.onResume().subscribe();
+            galleryManager.updateImages().subscribe();
         }
     }
 
@@ -202,6 +202,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             }
         }
     }
+
     protected void showNoCameraSnack() {
         showSnack(R.string.no_camera_permission);
     }
@@ -210,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         showSnack(R.string.no_gallery_permission);
     }
 
-    protected void showSnack(@StringRes int resId) {
+    private void showSnack(@StringRes int resId) {
         Snackbar.make(fab, resId, Snackbar.LENGTH_INDEFINITE)
                 .setAction(R.string.action_settings, settingsListener).show();
     }
@@ -222,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     .beginTransaction()
                     .remove((Fragment) galleryViewable)
                     .commit();
+            galleryViewable = null;
         }
     }
 

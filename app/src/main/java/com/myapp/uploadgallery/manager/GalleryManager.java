@@ -13,7 +13,7 @@ import java.io.File;
 import io.reactivex.Observable;
 
 public interface GalleryManager {
-    Observable onResume();
+    Observable updateImages();
     Observable<GalleryImage> uploadCachedPicture(Context context);
     void setView(Viewable view);
     GalleryViewable.GalleryListener getGalleryListener();

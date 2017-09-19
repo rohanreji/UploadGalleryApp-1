@@ -45,7 +45,10 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                 .resize(800, 800)
                 .centerInside()
                 .into(holder.cellImage);
-        holder.cellTime.setText(DateFormatUtils.getFormattedTimestamp(image.getCreatedAtTimestamp()));
+        final long createdAtTimestamp = DateFormatUtils.parseTime(image.getCreatedAt());
+        final CharSequence formattedTimestamp =
+                DateFormatUtils.getFormattedTimestamp(createdAtTimestamp);
+        holder.cellTime.setText(formattedTimestamp);
     }
 
     @Override

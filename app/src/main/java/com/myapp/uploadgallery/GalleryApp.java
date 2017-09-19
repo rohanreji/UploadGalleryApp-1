@@ -49,6 +49,10 @@ public class GalleryApp extends Application implements HasActivityInjector,
                 .setLoggingEnabled(true);
     }
 
+    public AppComponent component() {
+        return appComponent;
+    }
+
     @Override
     public AndroidInjector<Activity> activityInjector() {
         return activityInjector;
@@ -86,5 +90,5 @@ public class GalleryApp extends Application implements HasActivityInjector,
 
     }
 
-    // TODO: 9/19/17 check internet connection on resume
+    // TODO: 9/19/17 check internet connection on updateImages
 }

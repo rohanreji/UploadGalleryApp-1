@@ -2,7 +2,6 @@ package com.myapp.uploadgallery.api;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import com.myapp.uploadgallery.util.DateFormatUtils;
 
 public class GalleryImage {
     @Expose
@@ -26,10 +25,6 @@ public class GalleryImage {
 
     public void setCreatedAt(final String createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public long getCreatedAtTimestamp() {
-        return DateFormatUtils.parseTime(createdAt);
     }
 
     @Override

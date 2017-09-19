@@ -41,7 +41,7 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public Observable onResume() {
+    public Observable updateImages() {
         view.showProgress(true);
         return endpoint.getImagesForUser(userId.get())
                 .flatMap((ImageResponse imageResponse) -> Observable.fromIterable(
@@ -50,7 +50,6 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext((GalleryImage iur) -> view.showProgress(true))
                 .doOnNext((GalleryImage image) -> {
-                    view.showProgress(true);
                     images.add(image);
                 })
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
