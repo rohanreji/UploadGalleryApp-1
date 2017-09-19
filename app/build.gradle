@@ -10,7 +10,7 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.myapp.uploadgallery.MockJUnitRunner"
 
         buildConfigField "String", "API_URL", "\"https://polar-bastion-91741.herokuapp.com\""
     }
@@ -30,6 +30,7 @@ android {
     packagingOptions {
         exclude 'META-INF/rxjava.properties'
     }
+    compileOptions.incremental = false
 }
 
 dependencies {
@@ -41,6 +42,7 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
     compile 'com.android.support:design:26.+'
     testCompile 'junit:junit:4.12'
+    testCompile 'com.google.truth:truth:0.34'
 
     def daggerVersion = '2.11'
     annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
@@ -72,8 +74,15 @@ dependencies {
     compile 'com.isseiaoki:simplecropview:1.1.6'
 
     compile 'org.mockito:mockito-core:2.7.12'
-    testCompile "org.robolectric:robolectric:3.4.2"
-    testCompile "com.google.dagger:dagger:$daggerVersion"
+    androidTestCompile "com.google.dagger:dagger:$daggerVersion"
+
+    androidTestAnnotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
 }
 
-
+android.applicationVariants.all { variant ->
+    if (variant.buildType.name == "debug") {
+        def aptOutputDir = new File(buildDir, "generated/source/apt/${variant.unitTestVariant.dirName}")
+        variant.unitTestVariant.addJavaSourceFoldersToModel(aptOutputDir)
+        assembleDebug.finalizedBy('assembleDebugUnitTest')
+    }
+}

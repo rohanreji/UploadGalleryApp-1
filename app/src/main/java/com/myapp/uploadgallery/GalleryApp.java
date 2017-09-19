@@ -31,15 +31,12 @@ public class GalleryApp extends Application implements HasActivityInjector,
     @Inject
     UserId userId;
 
-    private AppComponent appComponent;
+    AppComponent appComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
-        appComponent.inject(this);
+        initComponent();
 
         registerActivityLifecycleCallbacks(this);
 
@@ -49,7 +46,14 @@ public class GalleryApp extends Application implements HasActivityInjector,
                 .setLoggingEnabled(true);
     }
 
-    public AppComponent component() {
+    void initComponent() {
+        appComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .build();
+        appComponent.inject(this);
+    }
+
+    public AppComponent getAppComponent() {
         return appComponent;
     }
 

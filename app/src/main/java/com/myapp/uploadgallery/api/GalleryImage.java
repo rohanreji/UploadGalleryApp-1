@@ -21,6 +21,12 @@ public class GalleryImage implements Comparable<GalleryImage> {
         return createdAt;
     }
 
+    public void setUrl(final String url) {
+        this.url = url;
+    }
+    public void setCreatedAt(final String createdAt) {
+        this.createdAt = createdAt;
+    }
     @Override
     public boolean equals(final Object o) {
         if (this == o) {

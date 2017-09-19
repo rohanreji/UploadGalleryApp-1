@@ -1,62 +1,47 @@
 package com.myapp.uploadgallery.ui;
 
-import android.graphics.drawable.ColorDrawable;
-import android.support.test.espresso.matcher.BoundedMatcher;
+import android.app.Instrumentation;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.espresso.core.deps.dagger.Component;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.content.ContextCompat;
-import android.view.View;
 
-import com.myapp.uploadgallery.R;
+import com.myapp.uploadgallery.MockGalleryApp;
+import com.myapp.uploadgallery.di.AppComponent;
+import com.myapp.uploadgallery.di.MockAppModule;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static android.support.test.espresso.Espresso.onView;
-import static android.support.test.espresso.assertion.ViewAssertions.matches;
-import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static android.support.test.espresso.matcher.ViewMatchers.withParent;
-import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import javax.inject.Singleton;
 
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
+    @Singleton
+    @Component(modules = MockAppModule.class)
+    public interface TestComponent extends AppComponent {
+        void inject(MainActivityTest mainActivityTest);
+    }
+
     @Rule
-    public ActivityTestRule activityTestRule =
-            new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(
+            MainActivity.class,
+            true,     // initialTouchMode
+            false);   // launchActivity. False so we can customize the intent per test method
 
-    @Test
-    public void testToolbarDesign() {
-        onView(withId(R.id.toolbar)).check(matches(isDisplayed()));
-
-        onView(withText(R.string.app_name)).check(matches(withParent(withId(R.id.toolbar))));
-
-        onView(withId(R.id.toolbar)).check(matches(withToolbarBackGroundColor()));
-    }
-
-    private Matcher<? super View> withToolbarBackGroundColor() {
-        return new BoundedMatcher<View, View>(View.class) {
-            @Override
-            public boolean matchesSafely(View view) {
-                final ColorDrawable buttonColor = (ColorDrawable) view.getBackground();
-
-                return ContextCompat
-                        .getColor(activityTestRule.getActivity(), R.color.colorPrimary) ==
-                        buttonColor.getColor();
-            }
-
-            @Override
-            public void describeTo(Description description) {
-            }
-        };
+    @Before
+    public void setUp() {
+        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+        MockGalleryApp app
+                = (MockGalleryApp) instrumentation.getTargetContext().getApplicationContext();
+        TestComponent component = (TestComponent) app.getAppComponent();
+        component.inject(this);
     }
 
     @Test
-    public void testFab() {
-        onView(withId(R.id.fab)).check(matches(isDisplayed()));
+    public void test1() {
+        System.out.println("Do something");
     }
-
 }
