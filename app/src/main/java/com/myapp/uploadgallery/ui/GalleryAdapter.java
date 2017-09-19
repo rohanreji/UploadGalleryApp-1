@@ -10,10 +10,11 @@ import android.widget.TextView;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.util.DateFormatUtils;
-import com.myapp.uploadgallery.util.UniqueList;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -22,9 +23,10 @@ import butterknife.ButterKnife;
  * Adapter for the gallery of uploaded images.
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
-    private List<GalleryImage> images = new UniqueList<>();
+    private List<GalleryImage> images = new ArrayList<>();
 
-    public void setImages(List<GalleryImage> pics) {
+    public void setImages(Set<GalleryImage> pics) {
+        this.images.clear();
         this.images.addAll(pics);
     }
 

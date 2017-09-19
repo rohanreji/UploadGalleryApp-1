@@ -1,6 +1,7 @@
 package com.myapp.uploadgallery.manager;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
@@ -8,11 +9,12 @@ import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.ui.GalleryViewable;
 import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
-import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,13 +27,14 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
         ManipulatorViewable.ManipulatorListener {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
-    private final UniqueList<GalleryImage> images;
+    private final Set<GalleryImage> images;
     private Viewable view;
 
     public GalleryManagerImpl(final UserId userId, final GalleryEndpoint endpoint) {
         this.userId = userId;
         this.endpoint = endpoint;
-        images = new UniqueList<>();
+        images = new TreeSet<GalleryImage>();
+        Log.i("IMAGES", String.valueOf(images.hashCode()));
     }
 
     @Override
@@ -43,21 +46,22 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     public Observable updateImages() {
         view.showProgress(true);
         return endpoint.getImagesForUser(userId.get())
-                .flatMap((ImageResponse imageResponse) -> Observable.fromIterable(
-                        imageResponse.getImages()))
+                .flatMap((ImageResponse imageResponse) -> {
+                    return Observable.just(images.addAll(imageResponse.getImages()));
+                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext((GalleryImage iur) -> view.showProgress(true))
-                .doOnNext((GalleryImage image) -> {
-                    images.add(image);
-                })
                 .doOnError((Throwable t) -> view.showNetworkAlert(t))
-                .doOnComplete(() -> {
+                .doOnComplete(() ->
+                {
                     imagesUpdated();
+                    view.showProgress(false);
                 });
     }
 
     private void imagesUpdated() {
+        Log.i("IMAGES", "size: " + String.valueOf(images.size()));
+        Log.i("IMAGES", String.valueOf(images.hashCode()));
         if (images.size() == 0) {
             view.showProgress(false);
             view.showStubText();

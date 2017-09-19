@@ -28,10 +28,10 @@ import android.widget.Toast;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
-import com.myapp.uploadgallery.util.UniqueList;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     @Override
-    public void showGallery(final UniqueList<GalleryImage> images) {
+    public void showGallery(final Set<GalleryImage> images) {
         if (galleryViewable == null) {
             // Create new fragment and transaction
             GalleryFragment newFragment = new GalleryFragment();

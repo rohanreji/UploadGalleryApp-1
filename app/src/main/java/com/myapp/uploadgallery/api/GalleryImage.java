@@ -1,9 +1,11 @@
 package com.myapp.uploadgallery.api;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class GalleryImage {
+public class GalleryImage implements Comparable<GalleryImage> {
     @Expose
     String url;
 
@@ -36,5 +38,10 @@ public class GalleryImage {
     @Override
     public int hashCode() {
         return createdAt.hashCode();
+    }
+
+    @Override
+    public int compareTo(@NonNull final GalleryImage galleryImage) {
+        return createdAt.compareTo(galleryImage.createdAt);
     }
 }
