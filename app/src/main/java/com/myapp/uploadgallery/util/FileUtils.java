@@ -17,6 +17,10 @@ public class FileUtils {
 
     public static File getPictureFile(final Context context) {
         String name = "cached_bitmap.jpg";
-        return new File(context.getCacheDir(), name);
+        final File file = new File(context.getCacheDir(), name);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return file;
     }
 }

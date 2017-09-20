@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -98,6 +99,7 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
 
             return endpoint.postImageForUser(userId.get(), part)
                     .observeOn(AndroidSchedulers.mainThread())
+                    .doOnError((Throwable t) -> view.showUploadAlert(t))
                     .flatMap((GalleryImage response) -> {
                         images.add(response);
                         imagesUpdated();
@@ -130,6 +132,16 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError((Throwable t) -> view.showUploadAlert(t))
                 .doFinally(() -> view.showProgress(false))
-                .subscribe();
+                .subscribe(new Consumer<GalleryImage>() {
+                    @Override
+                    public void accept(final GalleryImage galleryImage) throws Exception {
+                        view.showProgress(false);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(final Throwable throwable) throws Exception {
+                        view.showUploadAlert(throwable);
+                    }
+                });
     }
 }

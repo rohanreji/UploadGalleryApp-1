@@ -37,7 +37,6 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         ButterKnife.bind(this, view);
 
         image.setCropMode(CropImageView.CropMode.FREE);
-        image.setDebug(true);
 
         if (null != bitmap) {
             setBitmapToManipulate(bitmap);

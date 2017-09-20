@@ -17,7 +17,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -28,7 +28,10 @@ import android.widget.Toast;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
+import com.myapp.uploadgallery.util.DialogPool;
+import com.myapp.uploadgallery.util.FileUtils;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Set;
@@ -39,7 +42,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
-import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements Viewable,
         ManipulatorViewable.ManipulatorUiListener {
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     public static final int PERMISSION_REQUEST_CAMERA = 104;
     public static final String GALLERY = "GALLERY";
     public static final String MANIPULATOR = "MANIPULATOR";
+    public static final String NETWORK = "NETWORK";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -67,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     private GalleryViewable galleryViewable;
     private ManipulatorViewable manipulatorViewable;
+
+    @Inject
+    DialogPool dialogPool;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -93,16 +101,17 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @OnClick(R.id.fab)
     public void onClick() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_upload_title)
-                .setMessage(R.string.dialog_upload_message)
-                .setNegativeButton(R.string.dialog_upload_gallery,
-                        (DialogInterface dialog, int which) -> startGallery());
+        int ok = 0;
+        DialogInterface.OnClickListener okListener = null;
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            builder.setPositiveButton(R.string.dialog_upload_camera,
-                    (DialogInterface dialog, int which) -> startCamera());
+            ok = R.string.dialog_upload_camera;
+            okListener = (DialogInterface dialog, int which) -> startCamera();
         }
-        builder.create().show();
+        DialogInterface.OnClickListener cancelListener =
+                (DialogInterface dialog, int which) -> startCamera();
+        dialogPool.showDialog(GALLERY, this, R.string.dialog_upload_title,
+                R.string.dialog_upload_message,
+                ok, okListener, R.string.dialog_upload_gallery, cancelListener);
     }
 
     @Override
@@ -110,14 +119,27 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         super.onStart();
 
         if (manipulatorViewable == null) {
-//            galleryManager.updateImages().subscribe();
+            galleryManager.updateImages()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer() {
+                        @Override
+                        public void accept(final Object o) throws Exception {
+
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(final Throwable throwable) throws Exception {
+                            showProgress(false);
+                            showStubText();
+                            showNetworkAlert(throwable);
+                        }
+                    });
         }
     }
 
     @Override
-    public Observable<Void> showProgress(boolean show) {
+    public void showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
-        return Observable.empty();
     }
 
     public void startCamera() {
@@ -128,7 +150,11 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     new String[]{Manifest.permission.CAMERA},
                     PERMISSION_REQUEST_GALLERY);
         } else {
+            final Uri uri = FileProvider.getUriForFile(this, "com.myapp.uploadgallery.FileProvider",
+                    FileUtils.getPictureFile(this));
+
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
@@ -181,10 +207,11 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+            showProgress(true);
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                showManipulator(imageBitmap);
+                File file = FileUtils.getPictureFile(this);
+                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
+                showManipulator(bitmap);
             } else if (requestCode == REQUEST_IMAGE_GALLERY) {
                 try {
                     final Uri imageUri = data.getData();
@@ -257,23 +284,15 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     @Override
-    public Observable<Void> showNetworkAlert(final Throwable throwable) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_network_title)
-                .setMessage(R.string.dialog_network_message)
-                .setPositiveButton(android.R.string.ok, null);
-        builder.create().show();
-        return Observable.empty();
+    public void showNetworkAlert(final Throwable throwable) {
+        dialogPool.showDialog(NETWORK, this, R.string.dialog_network_title,
+                R.string.dialog_network_message, android.R.string.ok, null, 0, null);
     }
 
     @Override
-    public Observable<Void> showUploadAlert(final Throwable throwable) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_manipulation_title)
-                .setMessage(R.string.dialog_manipulation_message)
-                .setPositiveButton(android.R.string.ok, null);
-        builder.create().show();
-        return Observable.empty();
+    public void showUploadAlert(final Throwable throwable) {
+        dialogPool.showDialog(MANIPULATOR, this, R.string.dialog_manipulation_title,
+                R.string.dialog_manipulation_message, android.R.string.ok, null, 0, null);
     }
     @Override
     public void closeManipulator() {
