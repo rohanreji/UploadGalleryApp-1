@@ -6,9 +6,8 @@ import android.net.Uri;
 import java.io.File;
 
 /**
- * Created by margarita on 9/19/17.
+ * File-related methods used throughout app.
  */
-
 public class FileUtils {
     public static Uri getPictureUri(Context context) {
         File file = getPictureFile(context);

@@ -10,7 +10,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import java.util.Calendar;
 
 /**
- * Date format util methods.
+ * Date format methods used throughout app.
  */
 public class DateFormatUtils {
     public static long parseTime(@NonNull String createdAt) {
