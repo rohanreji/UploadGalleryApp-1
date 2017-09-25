@@ -18,7 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Has a gallery view with already uploaded images.
+ * Contains a gallery view with already uploaded images.
  */
 public class GalleryFragment extends Fragment implements GalleryViewable {
     @BindView(R.id.rvGallery)
