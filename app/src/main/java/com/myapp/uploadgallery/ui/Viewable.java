@@ -2,6 +2,7 @@ package com.myapp.uploadgallery.ui;
 
 import com.myapp.uploadgallery.api.GalleryImage;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -40,4 +41,8 @@ public interface Viewable {
      * @param throwable throwable that contains error message
      */
     void showUploadAlert(Throwable throwable);
+
+    void onFetchImagesStarted();
+    void onFetchImagesCompleted(List<GalleryImage> imageList);
+    void onFetchImagesError(Throwable throwable);
 }

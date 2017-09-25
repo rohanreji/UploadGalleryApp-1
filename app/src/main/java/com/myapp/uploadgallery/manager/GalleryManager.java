@@ -1,10 +1,6 @@
 package com.myapp.uploadgallery.manager;
 
-import com.myapp.uploadgallery.ui.GalleryViewable;
-import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
-
-import io.reactivex.Single;
 
 /**
  * Manages calls between view and model.
@@ -15,10 +11,16 @@ public interface GalleryManager {
      *
      * @return Single to simplify call chaining
      */
-    Single updateImages();
+//    Single updateImages();
 
     void setView(Viewable view);
 
-    GalleryViewable.GalleryListener getGalleryListener();
-    ManipulatorViewable.ManipulatorListener getManipulatorListener();
+//    GalleryViewable.GalleryListener getGalleryListener();
+//    ManipulatorViewable.ManipulatorListener getManipulatorListener();
+
+    void loadImages();
+    void uploadImage();
+    void subscribe();
+    void unsubscribe();
+    void onDestroy();
 }

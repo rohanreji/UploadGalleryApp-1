@@ -2,34 +2,39 @@ package com.myapp.uploadgallery.manager;
 
 import android.content.Context;
 
-import com.myapp.uploadgallery.api.TestGalleryEndpoint;
+import com.myapp.uploadgallery.api.GalleryEndpoint;
+import com.myapp.uploadgallery.api.GalleryImage;
+import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.ui.Viewable;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.concurrent.TimeUnit;
-
-import io.reactivex.observers.TestObserver;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 public class GalleryManagerTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    TestGalleryEndpoint endpoint = new TestGalleryEndpoint();
+    @Mock
+    GalleryEndpoint endpoint;
 
     @Mock
     UserId userId;
 
     @Mock
-    Viewable viewable;
+    Viewable view;
 
     @Mock
     Context context;
@@ -42,19 +47,61 @@ public class GalleryManagerTest {
     }
 
     @Test
-    public void testUpdateImages() {
-        Mockito.when(userId.get()).thenReturn("123");
-        manager = new GalleryManagerImpl(userId, endpoint, Schedulers.);
-        manager.setView(viewable);
+    public void testLoadImagesSuccessful() {
+        final String userId = "user1";
 
-        TestObserver updateImagesObserver = new TestObserver();
+        final GalleryImage img1 = new GalleryImage("http://placehold.it/120x120&text=image1",
+                "2017-09-18T15:14:20Z");
+        final ImageResponse item = new ImageResponse();
+        item.setImages(img1);
+        when(endpoint.getImagesForUser(userId)).thenReturn(Single.just(item));
 
-        final Object o = manager.updateImages().blockingGet();
+        when(this.userId.get()).thenReturn(userId);
+        manager = new GalleryManagerImpl(this.userId, endpoint,
+                Schedulers.trampoline(), Schedulers.trampoline());
+        manager.setView(view);
+        manager.loadImages();
+        InOrder inOrder = Mockito.inOrder(view);
+        inOrder.verify(view, times(1)).onFetchImagesStarted();
 
-        updateImagesObserver.awaitTerminalEvent(10, TimeUnit.SECONDS);
-
-        updateImagesObserver.assertNoErrors();
-
-        updateImagesObserver.assertSubscribed();
+        inOrder.verify(view, times(1)).onFetchImagesCompleted(item.getImages());
     }
+
+    @Test
+    public void testLoadEmptyImages() {
+        final String userId = "user1";
+
+        final ImageResponse item = new ImageResponse();
+        item.setImages();
+        when(endpoint.getImagesForUser(userId)).thenReturn(Single.just(item));
+
+        when(this.userId.get()).thenReturn(userId);
+        manager = new GalleryManagerImpl(this.userId, endpoint,
+                Schedulers.trampoline(), Schedulers.trampoline());
+        manager.setView(view);
+        manager.loadImages();
+        InOrder inOrder = Mockito.inOrder(view);
+        inOrder.verify(view, times(1)).onFetchImagesStarted();
+
+        inOrder.verify(view, times(1)).onFetchImagesCompleted(item.getImages());
+    }
+
+    @Test
+    public void testLoadImagesNotSuccessful() {
+        final String userId = "user1";
+
+        Exception exception = new Exception();
+        when(endpoint.getImagesForUser(userId)).thenReturn(Single.error(exception));
+
+        when(this.userId.get()).thenReturn(userId);
+        manager = new GalleryManagerImpl(this.userId, endpoint,
+                Schedulers.trampoline(), Schedulers.trampoline());
+        manager.setView(view);
+        manager.loadImages();
+        InOrder inOrder = Mockito.inOrder(view);
+        inOrder.verify(view, times(1)).onFetchImagesStarted();
+
+        inOrder.verify(view, times(1)).onFetchImagesError(exception);
+    }
+
 }

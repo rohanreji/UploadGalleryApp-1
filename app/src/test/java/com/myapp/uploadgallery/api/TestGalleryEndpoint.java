@@ -11,19 +11,10 @@ public class TestGalleryEndpoint implements GalleryEndpoint {
     public Single<ImageResponse> getImagesForUser(@Query("user_id") final String userId) {
         final GalleryImage img1 = new GalleryImage("http://placehold.it/120x120&text=image1",
                 "2017-09-18T15:14:20Z");
-        final GalleryImage img2 = new GalleryImage("http://placehold.it/120x120&text=image2",
-                "2017-09-19T15:30:27Z");
-        final GalleryImage img3 = new GalleryImage("http://placehold.it/120x120&text=image3",
-                "2017-09-20T16:20:37Z");
         switch (userId) {
             case "user1": {
                 final ImageResponse item = new ImageResponse();
                 item.setImages(img1);
-                return Single.just(item);
-            }
-            case "user2": {
-                final ImageResponse item = new ImageResponse();
-                item.setImages(img1, img2, img3);
                 return Single.just(item);
             }
             default: {

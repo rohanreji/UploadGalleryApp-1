@@ -34,6 +34,7 @@ import com.myapp.uploadgallery.util.FileUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -42,8 +43,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements Viewable,
         ManipulatorViewable.ManipulatorUiListener {
@@ -120,23 +119,23 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
         galleryManager.setView(this);
 
-        if (manipulatorViewable == null) {
-            galleryManager.updateImages()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer() {
-                        @Override
-                        public void accept(final Object o) throws Exception {
-
-                        }
-                    }, new Consumer<Throwable>() {
-                        @Override
-                        public void accept(final Throwable throwable) throws Exception {
-                            showProgress(false);
-                            showStubText();
-                            showNetworkAlert(throwable);
-                        }
-                    });
-        }
+//        if (manipulatorViewable == null) {
+//            galleryManager.updateImages()
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(new Consumer() {
+//                        @Override
+//                        public void accept(final Object o) throws Exception {
+//
+//                        }
+//                    }, new Consumer<Throwable>() {
+//                        @Override
+//                        public void accept(final Throwable throwable) throws Exception {
+//                            showProgress(false);
+//                            showStubText();
+//                            showNetworkAlert(throwable);
+//                        }
+//                    });
+//        }
     }
 
     @Override
@@ -269,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             transaction.add(R.id.flFragment, newFragment, GALLERY);
             transaction.commit();
             galleryViewable = newFragment;
-            galleryViewable.setCallback(galleryManager.getGalleryListener());
+//            galleryViewable.setCallback(galleryManager.getGalleryListener());
         }
         galleryViewable.setImages(images);
     }
@@ -283,8 +282,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
             manipulatorViewable = newFragment;
-            manipulatorViewable.setManipulatorListeners(galleryManager.getManipulatorListener(),
-                    this);
+//            manipulatorViewable.setManipulatorListeners(galleryManager.getManipulatorListener(),
+//                    this);
         }
         manipulatorViewable.setBitmapToManipulate(bitmap);
         showFab(false);
@@ -321,5 +320,18 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     private void showFab(boolean show) {
         fab.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onFetchImagesStarted() {
+
+    }
+    @Override
+    public void onFetchImagesCompleted(final List<GalleryImage> imageList) {
+
+    }
+    @Override
+    public void onFetchImagesError(final Throwable throwable) {
+
     }
 }
