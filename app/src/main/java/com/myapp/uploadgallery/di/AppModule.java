@@ -1,6 +1,8 @@
 package com.myapp.uploadgallery.di;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -41,7 +43,16 @@ public class AppModule {
     @Provides
     @Singleton
     UserId provideUserId() {
-        return new UserId(application.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE));
+        return userId();
+    }
+
+    @NonNull
+    UserId userId() {
+        return new UserId(getSharedPreferences());
+    }
+
+    SharedPreferences getSharedPreferences() {
+        return application.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     @Provides
@@ -53,20 +64,21 @@ public class AppModule {
     @Provides
     @Singleton
     GalleryEndpoint provideGalleryEndpoint(Gson gson) {
+        return endpoint(gson);
+    }
+
+    GalleryEndpoint endpoint(Gson gson) {
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        final OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
         Retrofit adapter = new Retrofit.Builder()
-                .client(client())
+                .client(client)
                 .baseUrl(BuildConfig.API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
 
         return adapter.create(GalleryEndpoint.class);
-    }
-
-    OkHttpClient client() {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        return new OkHttpClient.Builder().addInterceptor(interceptor).build();
     }
 
     @Provides
