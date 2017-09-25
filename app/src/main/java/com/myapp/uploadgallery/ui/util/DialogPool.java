@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.util;
+package com.myapp.uploadgallery.ui.util;
 
 import android.content.Context;
 import android.content.DialogInterface;
