@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Contains list of user uploaded images.
+ */
 public class ImageResponse {
     @Expose
     ArrayList<GalleryImage> images;

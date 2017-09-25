@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * Uploaded image defined by url and creation time.
+ */
 public class GalleryImage implements Comparable<GalleryImage> {
     @Expose
     String url;

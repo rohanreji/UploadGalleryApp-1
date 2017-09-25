@@ -19,6 +19,9 @@ import io.reactivex.schedulers.Schedulers;
 
 import static com.myapp.uploadgallery.util.FileUtils.getPictureFile;
 
+/**
+ * Fragment that contains view with manipulation abilities.
+ */
 public class ManipulatorFragment extends Fragment implements ManipulatorViewable {
     @BindView(R.id.cropImageView)
     CropImageView image;
@@ -27,7 +30,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     View progress;
 
     private ManipulatorListener listener;
-    private ManipulatorUiListener uilistener;
+    private ManipulatorUiListener uiListener;
     private Bitmap bitmap;
 
     @Override
@@ -60,13 +63,13 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     public void setManipulatorListeners(final ManipulatorListener listener,
                                         final ManipulatorUiListener uilistener) {
         this.listener = listener;
-        this.uilistener = uilistener;
+        this.uiListener = uilistener;
     }
 
     @OnClick(R.id.ivManipulatorCancel)
     public void close() {
-        if (null != uilistener) {
-            uilistener.closeManipulator();
+        if (null != uiListener) {
+            uiListener.closeManipulator();
         }
     }
 
@@ -80,8 +83,8 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull Bitmap bitmap) throws
                             Exception {
-                        if (null != uilistener) {
-                            uilistener.closeManipulator();
+                        if (null != uiListener) {
+                            uiListener.closeManipulator();
                         }
                         if (null != listener) {
                             listener.onManipulatorCropped(getPictureFile(getContext()), bitmap);
@@ -91,8 +94,8 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                     @Override
                     public void accept(@io.reactivex.annotations.NonNull Throwable throwable)
                             throws Exception {
-                        if (null != uilistener) {
-                            uilistener.onManipulationError();
+                        if (null != uiListener) {
+                            uiListener.onManipulationError();
                         }
                     }
                 });
