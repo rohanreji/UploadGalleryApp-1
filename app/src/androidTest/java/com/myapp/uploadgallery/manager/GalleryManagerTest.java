@@ -26,9 +26,5 @@ public class GalleryManagerTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-//        when(interactor.getUserProfile()).thenReturn(Observable.just(new UserProfile()));
-//        presenter = new ProfilePresenter(interactor);
-//        presenter.attachView(view);
     }
-
 }

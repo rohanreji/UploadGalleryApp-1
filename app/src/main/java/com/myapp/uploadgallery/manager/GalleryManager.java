@@ -10,9 +10,10 @@ import com.myapp.uploadgallery.ui.Viewable;
 import java.io.File;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface GalleryManager {
-    Observable updateImages();
+    Single updateImages();
 
     Observable<GalleryImage> uploadCachedPicture(File file);
 

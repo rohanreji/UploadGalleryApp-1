@@ -1,5 +1,6 @@
 package com.myapp.uploadgallery.api;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import retrofit2.http.GET;
@@ -16,7 +17,7 @@ public interface GalleryEndpoint {
 
     @Multipart
     @POST("images/{userId}")
-    Single<GalleryImage> postImageForUser(
+    Observable<GalleryImage> postImageForUser(
             @Path("userId") String userId,
             @Part MultipartBody.Part image);
 }

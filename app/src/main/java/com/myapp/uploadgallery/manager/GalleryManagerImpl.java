@@ -16,7 +16,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
@@ -42,19 +44,14 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public Observable updateImages() {
-        view.showProgress(true);
+    public Single updateImages() {
         return endpoint.getImagesForUser(userId.get())
-                .flatMap((ImageResponse imageResponse) ->
-                        Observable.just(images.addAll(imageResponse.getImages())))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnError((Throwable t) -> view.showNetworkAlert(t))
-                .doOnComplete(() ->
-                {
-                    imagesUpdated();
-                    view.showProgress(false);
-                });
+                .doOnSubscribe((Disposable disposable) -> view.showProgress(true))
+                .doOnSuccess((ImageResponse imageResponse)
+                        -> images.addAll(imageResponse.getImages()))
+                .doOnError((Throwable throwable) -> view.showNetworkAlert(throwable));
     }
 
     private void imagesUpdated() {
