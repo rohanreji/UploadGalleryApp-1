@@ -37,6 +37,7 @@ public class GalleryApp extends Application implements HasActivityInjector,
     public void onCreate() {
         super.onCreate();
         initComponent();
+        appComponent.inject(this);
 
         registerActivityLifecycleCallbacks(this);
 
@@ -50,7 +51,6 @@ public class GalleryApp extends Application implements HasActivityInjector,
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
                 .build();
-        appComponent.inject(this);
     }
 
     public AppComponent getAppComponent() {
