@@ -2,7 +2,6 @@ package com.myapp.uploadgallery.manager;
 
 import android.graphics.Bitmap;
 
-import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.ui.GalleryViewable;
 import com.myapp.uploadgallery.ui.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.Viewable;
@@ -13,8 +12,6 @@ import io.reactivex.Single;
 
 public interface GalleryManager {
     Single updateImages();
-
-    Single<GalleryImage> uploadCachedPicture(File file);
 
     void setView(Viewable view);
 

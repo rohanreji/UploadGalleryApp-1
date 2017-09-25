@@ -18,7 +18,6 @@ import java.util.TreeSet;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -85,8 +84,7 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
         });
     }
 
-    @Override
-    public Single<GalleryImage> uploadCachedPicture(final File pictureFile) {
+    private Single<GalleryImage> uploadCachedPicture(final File pictureFile) {
         RequestBody body =
                 RequestBody.create(MediaType.parse("image/*"), pictureFile);
         MultipartBody.Part part =
@@ -127,16 +125,7 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnError((Throwable t) -> view.showUploadAlert(t))
                 .doFinally(() -> view.showProgress(false))
-                .subscribe(new Consumer<GalleryImage>() {
-                    @Override
-                    public void accept(final GalleryImage galleryImage) throws Exception {
-                        view.showProgress(false);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(final Throwable throwable) throws Exception {
-                        view.showUploadAlert(throwable);
-                    }
-                });
+                .subscribe((GalleryImage galleryImage) -> view.showProgress(false),
+                        (Throwable throwable) -> view.showUploadAlert(throwable));
     }
 }
