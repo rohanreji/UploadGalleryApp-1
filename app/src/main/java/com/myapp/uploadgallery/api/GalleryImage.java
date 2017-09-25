@@ -13,6 +13,15 @@ public class GalleryImage implements Comparable<GalleryImage> {
     @Expose
     String createdAt;
 
+    public GalleryImage() {
+        super();
+    }
+
+    public GalleryImage(final String url, final String createdAt) {
+        this.url = url;
+        this.createdAt = createdAt;
+    }
+
     public String getUrl() {
         return url;
     }

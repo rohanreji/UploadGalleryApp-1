@@ -3,6 +3,7 @@ package com.myapp.uploadgallery.api;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ImageResponse {
@@ -18,5 +19,12 @@ public class ImageResponse {
             this.images = new ArrayList<>();
         }
         this.images.addAll(images);
+    }
+
+    public void setImages(GalleryImage... images) {
+        if (this.images == null) {
+            this.images = new ArrayList<>();
+        }
+        this.images.addAll(Arrays.asList(images));
     }
 }

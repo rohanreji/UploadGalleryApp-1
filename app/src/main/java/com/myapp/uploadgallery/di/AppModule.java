@@ -49,7 +49,6 @@ public class AppModule {
     @Provides
     @Singleton
     GalleryEndpoint provideGalleryEndpoint(Gson gson) {
-
         Retrofit adapter = new Retrofit.Builder()
                 .baseUrl(BuildConfig.API_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
