@@ -22,9 +22,14 @@ import butterknife.ButterKnife;
 /**
  * Adapter for the gallery of uploaded images.
  */
-public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
+class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     private List<GalleryImage> images = new ArrayList<>();
 
+    /**
+     * Adds new images to the adapter.
+     *
+     * @param pics images to add
+     */
     public void setImages(Set<GalleryImage> pics) {
         this.images.clear();
         this.images.addAll(pics);
@@ -68,7 +73,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         @BindView(R.id.tvCellTime)
         TextView cellTime;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }

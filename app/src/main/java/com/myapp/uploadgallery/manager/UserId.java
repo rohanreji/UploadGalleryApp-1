@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import java.util.UUID;
 
 /**
- * Unique identifier for each user install.
+ * Unique identifier for every app install.
  */
 public class UserId {
     static final String USER_ID = "GALLERY_USER_ID";
