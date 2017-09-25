@@ -54,10 +54,8 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
 
     @Override
     public void setImages(final List<GalleryImage> images) {
-        if (null != adapter) {
-            adapter.setImages(images);
-            adapter.notifyDataSetChanged();
-        }
+        adapter.setImages(images);
+        adapter.notifyDataSetChanged();
     }
 
 }

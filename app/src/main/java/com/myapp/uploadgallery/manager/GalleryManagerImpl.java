@@ -127,9 +127,13 @@ public class GalleryManagerImpl implements GalleryManager {
                 .subscribeOn(backgroundScheduler)
                 .observeOn(mainScheduler)
                 .subscribe((ImageResponse imageResponse) -> {
-                    view.onFetchImagesCompleted(imageResponse.getImages());
+                    if (null != view) {
+                        view.onFetchImagesCompleted(imageResponse.getImages());
+                    }
                 }, (Throwable throwable) -> {
-                    view.onFetchImagesError(throwable);
+                    if (null != view) {
+                        view.onFetchImagesError(throwable);
+                    }
                 });
         subscriptions.add(disposable);
     }
@@ -148,6 +152,7 @@ public class GalleryManagerImpl implements GalleryManager {
     public void unsubscribe() {
         subscriptions.clear();
     }
+
     @Override
     public void onDestroy() {
         this.view = null;

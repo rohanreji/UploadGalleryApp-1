@@ -71,9 +71,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Inject
     GalleryManager galleryManager;
 
-    @Inject
-    GalleryAdapter galleryAdapter;
-
     private GalleryViewable galleryViewable;
     private ManipulatorViewable manipulatorViewable;
 
@@ -104,6 +101,16 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+
+        galleryManager.setView(this);
+        galleryManager.subscribe();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        galleryManager.unsubscribe();
+        galleryManager.setView(null);
     }
 
     @OnClick(R.id.fab)
@@ -124,9 +131,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     protected void onResume() {
         super.onResume();
-
-        galleryManager.setView(this);
-        galleryManager.subscribe();
 
 //        if (manipulatorViewable == null) {
 //            galleryManager.updateImages()
@@ -150,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     protected void onPause() {
         super.onPause();
-        galleryManager.setView(null);
     }
 
     private void showProgress(boolean show) {
