@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">UploadGallery</string>
     <string name="action_settings">Settings</string>
-    <string name="empty_gallery">No images uploaded yet.\nPress \'+\' to start uploading process</string>
+    <string name="empty_gallery">No uploaded images found.\nPress \'+\' to start uploading process</string>
     <string name="dialog_upload_title">Upload image</string>
     <string name="dialog_upload_message">Choose image source</string>
     <string name="dialog_upload_camera">Camera</string>

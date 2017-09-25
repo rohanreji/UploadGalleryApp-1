@@ -51,7 +51,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                 .doOnSubscribe((Disposable disposable) -> view.showProgress(true))
                 .doOnSuccess((ImageResponse imageResponse)
                         -> images.addAll(imageResponse.getImages()))
-                .doOnError((Throwable throwable) -> view.showNetworkAlert(throwable));
+                .doOnError((Throwable throwable) -> view.showNetworkAlert(throwable))
+                .doOnEvent((ImageResponse ir, Throwable t) -> imagesUpdated());
     }
 
     private void imagesUpdated() {
