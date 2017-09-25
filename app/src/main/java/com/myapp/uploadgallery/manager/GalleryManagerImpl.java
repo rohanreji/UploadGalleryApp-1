@@ -15,10 +15,9 @@ import java.io.OutputStream;
 import java.util.Set;
 import java.util.TreeSet;
 
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -29,11 +28,16 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     private final GalleryEndpoint endpoint;
     private final Set<GalleryImage> images;
     private Viewable view;
+    private Scheduler backgroundScheduler;
+    private Scheduler mainScheduler;
 
-    public GalleryManagerImpl(final UserId userId, final GalleryEndpoint endpoint) {
+    public GalleryManagerImpl(final UserId userId, final GalleryEndpoint endpoint,
+                              Scheduler background, Scheduler main) {
         this.userId = userId;
         this.endpoint = endpoint;
-        images = new TreeSet<GalleryImage>();
+        this.images = new TreeSet<>();
+        this.backgroundScheduler = background;
+        this.mainScheduler = main;
     }
 
     @Override
@@ -44,8 +48,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     @Override
     public Single updateImages() {
         return endpoint.getImagesForUser(userId.get())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(backgroundScheduler)
+                .observeOn(mainScheduler)
                 .doOnSubscribe((Disposable disposable) -> view.showProgress(true))
                 .doOnSuccess((ImageResponse imageResponse)
                         -> images.addAll(imageResponse.getImages()))
@@ -91,7 +95,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                         body);
 
         return endpoint.postImageForUser(userId.get(), part)
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(backgroundScheduler)
+                .observeOn(mainScheduler)
                 .doOnError((Throwable t) -> view.showUploadAlert(t))
                 .doOnSuccess((GalleryImage image) -> {
                     images.add(image);
@@ -120,8 +125,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     public void onManipulatorCropped(final File pictureFile, final Bitmap bitmap) {
         saveBitmap(pictureFile, bitmap)
                 .flatMap((File file) -> uploadCachedPicture(file))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(backgroundScheduler)
+                .observeOn(mainScheduler)
                 .doOnError((Throwable t) -> view.showUploadAlert(t))
                 .doFinally(() -> view.showProgress(false))
                 .subscribe((GalleryImage galleryImage) -> view.showProgress(false),

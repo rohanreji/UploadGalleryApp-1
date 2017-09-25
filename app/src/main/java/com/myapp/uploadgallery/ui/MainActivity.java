@@ -115,8 +115,10 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
+
+        galleryManager.setView(this);
 
         if (manipulatorViewable == null) {
             galleryManager.updateImages()
@@ -137,6 +139,11 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        galleryManager.setView(null);
+    }
     @Override
     public void showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);

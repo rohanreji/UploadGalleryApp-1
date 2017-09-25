@@ -17,6 +17,7 @@ import org.mockito.junit.MockitoRule;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.observers.TestObserver;
+import io.reactivex.schedulers.Schedulers;
 
 public class GalleryManagerTest {
     @Rule
@@ -43,12 +44,12 @@ public class GalleryManagerTest {
     @Test
     public void testUpdateImages() {
         Mockito.when(userId.get()).thenReturn("123");
-        manager = new GalleryManagerImpl(userId, endpoint);
+        manager = new GalleryManagerImpl(userId, endpoint, Schedulers.);
         manager.setView(viewable);
 
         TestObserver updateImagesObserver = new TestObserver();
 
-        manager.updateImages().subscribeWith(updateImagesObserver);
+        final Object o = manager.updateImages().blockingGet();
 
         updateImagesObserver.awaitTerminalEvent(10, TimeUnit.SECONDS);
 
