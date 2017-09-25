@@ -62,8 +62,7 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
         }
     }
 
-    @Override
-    public Single<File> saveBitmap(final File file, final Bitmap bitmap) {
+    private Single<File> saveBitmap(final File file, final Bitmap bitmap) {
         return Single.defer(() -> {
             OutputStream out = null;
             try {
