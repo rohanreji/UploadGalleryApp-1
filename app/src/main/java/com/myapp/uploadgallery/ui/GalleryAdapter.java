@@ -14,7 +14,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -30,7 +29,7 @@ class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
      *
      * @param pics images to add
      */
-    public void setImages(Set<GalleryImage> pics) {
+    public void setImages(List<GalleryImage> pics) {
         this.images.clear();
         this.images.addAll(pics);
     }

@@ -141,7 +141,7 @@ public class GalleryManagerImpl implements GalleryManager {
 
     @Override
     public void subscribe() {
-        uploadImage();
+        loadImages();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.myapp.uploadgallery.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,10 +13,13 @@ import android.view.ViewGroup;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 
-import java.util.Set;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dagger.android.support.AndroidSupportInjection;
 
 /**
  * Contains a gallery view with already uploaded images.
@@ -24,8 +28,8 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
     @BindView(R.id.rvGallery)
     RecyclerView galleryView;
 
-    private GalleryAdapter adapter;
-    private GalleryListener listener;
+    @Inject
+    GalleryAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,30 +38,26 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
         ButterKnife.bind(this, view);
 
         galleryView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new GalleryAdapter();
         galleryView.setAdapter(adapter);
-
-        if (listener != null) {
-            listener.onViewCreated();
-        }
         return view;
     }
 
+    @Override
+    public void onAttach(final Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
+    }
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
-    public void setImages(final Set<GalleryImage> images) {
+    public void setImages(final List<GalleryImage> images) {
         if (null != adapter) {
             adapter.setImages(images);
             adapter.notifyDataSetChanged();
         }
     }
 
-    @Override
-    public void setCallback(final GalleryListener galleryListener) {
-        this.listener = galleryListener;
-    }
 }

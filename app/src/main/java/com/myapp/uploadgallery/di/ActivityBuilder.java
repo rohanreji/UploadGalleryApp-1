@@ -9,6 +9,9 @@ import dagger.android.ContributesAndroidInjector;
 public abstract class ActivityBuilder {
     @ContributesAndroidInjector(modules = MainActivityModule.class)
     abstract MainActivity contributeMainActivityInjector();
+
+    @ContributesAndroidInjector(modules = GalleryFragmentModule.class)
+    abstract MainActivity contributeGalleryFragmentInjector();
 }
 
 

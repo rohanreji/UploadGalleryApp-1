@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -43,9 +42,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.AndroidInjection;
+import dagger.android.AndroidInjector;
+import dagger.android.DispatchingAndroidInjector;
+import dagger.android.support.HasSupportFragmentInjector;
 
 public class MainActivity extends AppCompatActivity implements Viewable,
-        ManipulatorViewable.ManipulatorUiListener {
+        ManipulatorViewable.ManipulatorUiListener, HasSupportFragmentInjector {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
     public static final int REQUEST_IMAGE_GALLERY = 102;
     public static final int PERMISSION_REQUEST_GALLERY = 103;
@@ -69,11 +71,17 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Inject
     GalleryManager galleryManager;
 
+    @Inject
+    GalleryAdapter galleryAdapter;
+
     private GalleryViewable galleryViewable;
     private ManipulatorViewable manipulatorViewable;
 
     @Inject
     DialogPool dialogPool;
+
+    @Inject
+    DispatchingAndroidInjector<Fragment> fragmentInjector;
 
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
@@ -118,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         super.onResume();
 
         galleryManager.setView(this);
+        galleryManager.subscribe();
 
 //        if (manipulatorViewable == null) {
 //            galleryManager.updateImages()
@@ -143,8 +152,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         super.onPause();
         galleryManager.setView(null);
     }
-    @Override
-    public void showProgress(boolean show) {
+
+    private void showProgress(boolean show) {
         progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
@@ -246,7 +255,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                 .setAction(R.string.action_settings, settingsListener).show();
     }
 
-    @Override
     public void showStubText() {
         if (galleryViewable != null) {
             getSupportFragmentManager()
@@ -258,8 +266,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         emptyText.setVisibility(View.VISIBLE);
     }
 
-    @Override
-    public void showGallery(final Set<GalleryImage> images) {
+    public void showGallery(final List<GalleryImage> images) {
         if (galleryViewable == null) {
             // Create new fragment and transaction
             GalleryFragment newFragment = new GalleryFragment();
@@ -270,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             galleryViewable = newFragment;
 //            galleryViewable.setCallback(galleryManager.getGalleryListener());
         }
-        galleryViewable.setImages(images);
+//        galleryViewable.setImages(images);
     }
 
     public void showManipulator(Bitmap bitmap) {
@@ -289,17 +296,16 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         showFab(false);
     }
 
-    @Override
     public void showNetworkAlert(final Throwable throwable) {
         dialogPool.showDialog(NETWORK, this, R.string.dialog_network_title,
                 R.string.dialog_network_message, android.R.string.ok, null, 0, null);
     }
 
-    @Override
     public void showUploadAlert(final Throwable throwable) {
         dialogPool.showDialog(MANIPULATOR, this, R.string.dialog_manipulation_title,
                 R.string.dialog_manipulation_message, android.R.string.ok, null, 0, null);
     }
+
     @Override
     public void closeManipulator() {
         if (manipulatorViewable != null) {
@@ -324,14 +330,26 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Override
     public void onFetchImagesStarted() {
-
+        showProgress(true);
     }
+
     @Override
     public void onFetchImagesCompleted(final List<GalleryImage> imageList) {
-
+        showProgress(false);
+        if (imageList.isEmpty()) {
+            showStubText();
+        } else {
+            showGallery(imageList);
+        }
     }
+
     @Override
     public void onFetchImagesError(final Throwable throwable) {
+        showNetworkAlert(throwable);
+    }
 
+    @Override
+    public AndroidInjector<Fragment> supportFragmentInjector() {
+        return fragmentInjector;
     }
 }
