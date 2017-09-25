@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.util.Set;
 import java.util.TreeSet;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -65,8 +64,8 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
     }
 
     @Override
-    public Observable<File> saveBitmap(final File file, final Bitmap bitmap) {
-        return Observable.defer(() -> {
+    public Single<File> saveBitmap(final File file, final Bitmap bitmap) {
+        return Single.defer(() -> {
             OutputStream out = null;
             try {
                 out = new FileOutputStream(file);
@@ -82,28 +81,26 @@ public class GalleryManagerImpl implements GalleryManager, GalleryViewable.Galle
                     }
                 }
             }
-            return Observable.just(file);
+            return Single.just(file);
         });
     }
 
     @Override
-    public Observable<GalleryImage> uploadCachedPicture(final File pictureFile) {
-        return Observable.defer(() -> {
-            RequestBody body =
-                    RequestBody.create(MediaType.parse("image/*"), pictureFile);
-            MultipartBody.Part part =
-                    MultipartBody.Part.createFormData("image", pictureFile.getName(),
-                            body);
+    public Single<GalleryImage> uploadCachedPicture(final File pictureFile) {
+        RequestBody body =
+                RequestBody.create(MediaType.parse("image/*"), pictureFile);
+        MultipartBody.Part part =
+                MultipartBody.Part.createFormData("image", pictureFile.getName(),
+                        body);
 
-            return endpoint.postImageForUser(userId.get(), part)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnError((Throwable t) -> view.showUploadAlert(t))
-                    .flatMap((GalleryImage response) -> {
-                        images.add(response);
-                        imagesUpdated();
-                        return Observable.empty();
-                    });
-        });
+        return endpoint.postImageForUser(userId.get(), part)
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError((Throwable t) -> view.showUploadAlert(t))
+                .doOnSuccess((GalleryImage image) -> {
+                    images.add(image);
+                    imagesUpdated();
+                })
+                .doOnEvent((GalleryImage ir, Throwable t) -> imagesUpdated());
     }
 
     @Override

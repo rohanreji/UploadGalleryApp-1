@@ -9,18 +9,17 @@ import com.myapp.uploadgallery.ui.Viewable;
 
 import java.io.File;
 
-import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface GalleryManager {
     Single updateImages();
 
-    Observable<GalleryImage> uploadCachedPicture(File file);
+    Single<GalleryImage> uploadCachedPicture(File file);
 
     void setView(Viewable view);
 
     GalleryViewable.GalleryListener getGalleryListener();
     ManipulatorViewable.ManipulatorListener getManipulatorListener();
 
-    Observable<File> saveBitmap(final File file, final Bitmap bitmap);
+    Single<File> saveBitmap(final File file, final Bitmap bitmap);
 }
