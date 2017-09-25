@@ -15,14 +15,21 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Adapter for the gallery of uploaded images.
  */
-class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
+public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     private List<GalleryImage> images = new ArrayList<>();
+
+    @Inject
+    public GalleryAdapter() {
+        super();
+    }
 
     /**
      * Adds new images to the adapter.
