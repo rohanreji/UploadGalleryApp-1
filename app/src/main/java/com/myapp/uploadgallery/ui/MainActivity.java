@@ -173,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID,
                     FileUtils.getPictureFile(this));
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-            takePictureIntent.setDataAndType(uri, "image/*");
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             } else {

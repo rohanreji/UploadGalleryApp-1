@@ -112,7 +112,6 @@ public class FabClickTest {
         onView(withText(R.string.dialog_upload_title)).check(matches(isDisplayed()));
         //click on gallery
         onView(withText(R.string.dialog_upload_camera)).perform(click());
-        intended(expectedIntent);
         //verify that manipulator fragment is shown
         onView(withId(R.id.ivManipulatorCancel)).check(matches(isDisplayed()));
         onView(withId(R.id.cropImageView)).check(matches(hasDrawable()));
