@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -177,6 +176,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             takePictureIntent.setDataAndType(uri, "image/*");
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            } else {
+                Snackbar.make(fab, R.string.no_camera_resolved, Snackbar.LENGTH_INDEFINITE);
             }
         }
     }
@@ -206,7 +207,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startCamera();
                 } else {
-                    showNoCameraSnack();
+                    Snackbar.make(fab, R.string.no_camera_permission, Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.action_settings, settingsListener);
                 }
                 break;
             }
@@ -215,7 +217,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startGallery();
                 } else {
-                    showNoGallerySnack();
+                    Snackbar.make(fab, R.string.no_gallery_permission, Snackbar.LENGTH_INDEFINITE)
+                            .setAction(R.string.action_settings, settingsListener);
                 }
                 break;
             }
@@ -245,19 +248,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                 }
             }
         }
-    }
-
-    protected void showNoCameraSnack() {
-        showSnack(R.string.no_camera_permission);
-    }
-
-    protected void showNoGallerySnack() {
-        showSnack(R.string.no_gallery_permission);
-    }
-
-    private void showSnack(@StringRes int resId) {
-        Snackbar.make(fab, resId, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.action_settings, settingsListener).show();
     }
 
     public void showStubText() {

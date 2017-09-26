@@ -7,6 +7,7 @@
     <string name="dialog_upload_camera">Camera</string>
     <string name="dialog_upload_gallery">Gallery</string>
     <string name="no_camera_permission">To make a photo, camera permission is required</string>
+    <string name="no_camera_resolved">To make a photo, camera app is required</string>
     <string name="no_gallery_permission">To choose a photo, storage permission is required</string>
     <string name="dialog_network_title">Something went wrong</string>
     <string name="dialog_network_message">Sorry, internet connection was unsuccessful</string>
