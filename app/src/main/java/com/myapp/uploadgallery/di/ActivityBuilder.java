@@ -1,6 +1,6 @@
 package com.myapp.uploadgallery.di;
 
-import com.myapp.uploadgallery.ui.GalleryFragment;
+import com.myapp.uploadgallery.ui.gallery.GalleryFragment;
 import com.myapp.uploadgallery.ui.MainActivity;
 
 import dagger.Module;

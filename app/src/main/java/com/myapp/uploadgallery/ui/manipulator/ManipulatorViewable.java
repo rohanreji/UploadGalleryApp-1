@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.ui;
+package com.myapp.uploadgallery.ui.manipulator;
 
 import android.graphics.Bitmap;
 

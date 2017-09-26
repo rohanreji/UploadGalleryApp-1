@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.ui;
+package com.myapp.uploadgallery.ui.gallery;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;

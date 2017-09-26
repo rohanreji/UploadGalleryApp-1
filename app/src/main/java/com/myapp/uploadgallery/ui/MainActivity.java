@@ -28,6 +28,10 @@ import com.myapp.uploadgallery.BuildConfig;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
+import com.myapp.uploadgallery.ui.gallery.GalleryFragment;
+import com.myapp.uploadgallery.ui.gallery.GalleryViewable;
+import com.myapp.uploadgallery.ui.manipulator.ManipulatorFragment;
+import com.myapp.uploadgallery.ui.manipulator.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.util.DialogPool;
 import com.myapp.uploadgallery.util.FileUtils;
 

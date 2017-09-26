@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.ui;
+package com.myapp.uploadgallery.ui.gallery;
 
 import android.content.Context;
 import android.os.Bundle;

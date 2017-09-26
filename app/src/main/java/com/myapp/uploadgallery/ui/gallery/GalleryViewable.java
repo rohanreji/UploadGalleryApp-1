@@ -1,4 +1,4 @@
-package com.myapp.uploadgallery.ui;
+package com.myapp.uploadgallery.ui.gallery;
 
 import com.myapp.uploadgallery.api.GalleryImage;
 
