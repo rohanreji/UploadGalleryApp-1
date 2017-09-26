@@ -45,12 +45,15 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    def espressoVersion = '2.2.2'
+    def espressoVersion = '3.0.1'
+    def espressoIntents = '3.0.1'
 //    compile "com.android.support.test.espresso:espresso-idling-resource:$espressoVersion"
     androidTestCompile("com.android.support.test.espresso:espresso-core:$espressoVersion", {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-//    androidTestCompile "com.android.support.test.espresso:espresso-intents:$espressoVersion"
+    androidTestCompile("com.android.support.test.espresso:espresso-intents:$espressoIntents", {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
 //    androidTestCompile ('com.android.support.test:runner:1.0.0') {
 //        exclude module: 'support-annotations'
 //    }

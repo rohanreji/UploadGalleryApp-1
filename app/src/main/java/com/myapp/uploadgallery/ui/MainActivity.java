@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             okListener = (DialogInterface dialog, int which) -> startCamera();
         }
         DialogInterface.OnClickListener cancelListener =
-                (DialogInterface dialog, int which) -> startCamera();
+                (DialogInterface dialog, int which) -> startGallery();
         dialogPool.showDialog(GALLERY, this, R.string.dialog_upload_title,
                 R.string.dialog_upload_message,
                 ok, okListener, R.string.dialog_upload_gallery, cancelListener);
