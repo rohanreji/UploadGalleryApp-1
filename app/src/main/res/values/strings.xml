@@ -14,4 +14,6 @@
     <string name="dialog_manipulation_message">Sorry, saving or uploading image was unsuccessful</string>
     <string name="manipulator_save">Save</string>
     <string name="manipulator_cancel">Cancel</string>
+    <string name="cached_image_prefix">cached-image</string>
+    <string name="cached_image_suffix">.jpg</string>
 </resources>
