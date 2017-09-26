@@ -44,10 +44,7 @@ package com.myapp.uploadgallery.ui;
 //
 ////    @Test
 ////    public void testFabClickCamera() {
-////        //click on fab
-////        onView(withId(R.id.fab)).perform(click());
-////        //verify dialog is visible
-////        onView(withText(R.string.dialog_upload_title)).check(matches(isDisplayed()));
+
 ////
 ////        //click on camera button
 ////        onView(withText(R.string.dialog_upload_camera)).perform(click());
