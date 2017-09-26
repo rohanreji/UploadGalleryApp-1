@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.myapp.uploadgallery.BuildConfig;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
@@ -168,11 +169,12 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                     new String[]{Manifest.permission.CAMERA},
                     PERMISSION_REQUEST_GALLERY);
         } else {
-            final Uri uri = FileProvider.getUriForFile(this, "com.myapp.uploadgallery.FileProvider",
-                    FileUtils.getPictureFile(this));
-
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID,
+                    FileUtils.getPictureFile(this));
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            takePictureIntent.setDataAndType(uri, "image/*");
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }

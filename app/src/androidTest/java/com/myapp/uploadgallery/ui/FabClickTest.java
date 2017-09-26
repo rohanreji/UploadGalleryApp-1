@@ -104,6 +104,20 @@ public class FabClickTest {
         onView(withId(R.id.cropImageView)).check(matches(hasDrawable()));
     }
 
+    @Test
+    public void testFabDialogCameraClick() {
+        //click on fab
+        onView(withId(R.id.fab)).perform(click());
+        //verify dialog is visible
+        onView(withText(R.string.dialog_upload_title)).check(matches(isDisplayed()));
+        //click on gallery
+        onView(withText(R.string.dialog_upload_camera)).perform(click());
+        intended(expectedIntent);
+        //verify that manipulator fragment is shown
+        onView(withId(R.id.ivManipulatorCancel)).check(matches(isDisplayed()));
+        onView(withId(R.id.cropImageView)).check(matches(hasDrawable()));
+    }
+
     //from here:https://github.com/googlesamples/android-testing/blob/master/ui/espresso
     // /IntentsAdvancedSample/app/src/androidTest/java/com/example/android/testing/espresso
     // /intents/AdvancedSample/ImageViewHasDrawableMatcher.java
