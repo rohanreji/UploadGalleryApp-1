@@ -284,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     }
 
     public void showManipulator(Bitmap bitmap) {
+        showProgress(false);
         if (manipulatorViewable == null) {
             ManipulatorFragment newFragment = new ManipulatorFragment();
             android.support.v4.app.FragmentTransaction transaction =
