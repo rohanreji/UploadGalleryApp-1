@@ -29,6 +29,7 @@ import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.Intents.intending;
@@ -116,6 +117,20 @@ public class FabClickTest {
         onView(withId(R.id.ivManipulatorCancel)).check(matches(isDisplayed()));
         onView(withId(R.id.cropImageView)).check(matches(hasDrawable()));
     }
+
+    @Test
+    public void testManipulatorDialogCancel() {
+        //click on fab
+        onView(withId(R.id.fab)).perform(click());
+        //click on gallery
+        onView(withText(R.string.dialog_upload_gallery)).perform(click());
+        //verify that manipulator fragment is shown
+        onView(withId(R.id.ivManipulatorCancel)).check(matches(isDisplayed()));
+
+        onView(withId(R.id.ivManipulatorCancel)).perform(click());
+        onView(withId(R.id.ivManipulatorCancel)).check(doesNotExist());
+    }
+
 
     //from here:https://github.com/googlesamples/android-testing/blob/master/ui/espresso
     // /IntentsAdvancedSample/app/src/androidTest/java/com/example/android/testing/espresso
