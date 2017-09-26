@@ -61,9 +61,14 @@ dependencies {
 //        exclude module: 'support-annotations'
 //    }
 
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
-    compile 'com.android.support:design:26.+'
+    def supportVersion = '26.1.0'
+//    compile "com.android.support:appcompat-v7:$supportVersion"
+    compile "com.android.support:support-compat:$supportVersion"
+
+    compile ('com.android.support.constraint:constraint-layout:1.0.0-beta4', {
+        exclude group: 'com.android.support', module: 'appcompat'
+    })
+    compile "com.android.support:design:$supportVersion"
     testCompile 'junit:junit:4.12'
     testCompile 'com.google.truth:truth:0.34'
 
@@ -81,7 +86,7 @@ dependencies {
 
     compile 'com.squareup.picasso:picasso:2.5.2'
 
-    compile 'com.android.support:recyclerview-v7:26.0.0'
+    compile "com.android.support:recyclerview-v7:$supportVersion"
 
     compile 'com.jakewharton:butterknife:8.8.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
