@@ -113,13 +113,23 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         setSupportActionBar(toolbar);
 
         galleryManager.setView(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         galleryManager.subscribe(mIdlingResource);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        galleryManager.unsubscribe();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        galleryManager.unsubscribe();
         galleryManager.setView(null);
     }
 
