@@ -9,6 +9,9 @@ import java.util.UUID;
  */
 public class TestUserId extends UserId {
     private String uuid;
+
+    private static String test;
+
     public TestUserId(final SharedPreferences preferences) {
         super(preferences);
         uuid = UUID.randomUUID().toString();
@@ -16,6 +19,14 @@ public class TestUserId extends UserId {
 
     @Override
     public String get() {
-        return uuid;
+        return test != null ? test : uuid;
+    }
+
+    public static void set(String set) {
+        test = set;
+    }
+
+    public static void reset() {
+        test = null;
     }
 }

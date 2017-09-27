@@ -162,7 +162,7 @@ public class FabClickTest {
         testImageSave();
         testImageSave();
 
-        //verify gallery fragment recyclerview has one image
+        //verify gallery fragment recyclerview has 2 images
         onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(2));
     }
 

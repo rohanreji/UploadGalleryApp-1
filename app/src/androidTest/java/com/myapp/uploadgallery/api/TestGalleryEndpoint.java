@@ -13,6 +13,7 @@ import retrofit2.http.Query;
 public class TestGalleryEndpoint implements GalleryEndpoint {
     private int imageId = 0;
     private DateTimeFormatter formatter = ISODateTimeFormat.dateTimeNoMillis();
+
     @Override
     public Single<ImageResponse> getImagesForUser(@Query("user_id") final String userId) {
         final GalleryImage img1 = new GalleryImage("http://placehold.it/120x120&text=image1",

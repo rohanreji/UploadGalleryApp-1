@@ -1,6 +1,7 @@
 package com.myapp.uploadgallery.manager;
 
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import java.util.UUID;
 
@@ -12,7 +13,7 @@ public class UserId {
 
     private String userId;
 
-    public UserId(SharedPreferences preferences) {
+    public UserId(@NonNull SharedPreferences preferences) {
         this.userId = preferences.getString(USER_ID, null);
         if (null == userId) {
             this.userId = UUID.randomUUID().toString();
