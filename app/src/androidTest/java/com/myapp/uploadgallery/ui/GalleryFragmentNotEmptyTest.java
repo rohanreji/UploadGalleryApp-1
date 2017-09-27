@@ -29,25 +29,30 @@ public class GalleryFragmentNotEmptyTest {
     @Rule
     public ActivityTestRule<MainActivity> mActivityRule =
             new ActivityTestRule<>(
-                    MainActivity.class);
+                    MainActivity.class, false, false);
 
     private IdlingResource mIdlingResource;
 
     @Before
     public void setup() {
         TestUserId.set("user2");
-
-        mIdlingResource = mActivityRule.getActivity().getIdlingResource();
-        // To prove that the test fails, omit this call:
-        IdlingRegistry.getInstance().register(mIdlingResource);
     }
 
     @Test
     public void testManyPicGallery() {
+        launchActivity();
+
         //verify gallery fragment is shown
         onView(withId(R.id.rvGallery)).check(matches(isDisplayed()));
         //verify gallery has 1 image
         onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(greaterThan(1)));
+    }
+
+    private void launchActivity() {
+        mActivityRule.launchActivity(null);
+        mIdlingResource = mActivityRule.getActivity().getIdlingResource();
+        // To prove that the test fails, omit this call:
+        IdlingRegistry.getInstance().register(mIdlingResource);
     }
 
     @After
