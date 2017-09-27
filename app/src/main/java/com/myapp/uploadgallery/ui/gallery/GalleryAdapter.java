@@ -23,11 +23,15 @@ import butterknife.ButterKnife;
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
     private SortedList<GalleryImage> images;
+    private Picasso picasso;
 
-    public GalleryAdapter() {
+    public GalleryAdapter(Picasso picasso) {
         super();
 
-        images = new SortedList<GalleryImage>(GalleryImage.class,
+        this.picasso = picasso;
+        picasso.setLoggingEnabled(true);
+
+        images = new SortedList<>(GalleryImage.class,
                 new SortedList.Callback<GalleryImage>() {
                     @Override
                     public int compare(final GalleryImage o1, final GalleryImage o2) {
@@ -86,8 +90,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         GalleryImage image = images.get(position);
-        final Picasso picasso = Picasso.with(holder.cellImage.getContext());
-        picasso.setLoggingEnabled(true);
         picasso.load(image.getUrl())
                 .placeholder(R.drawable.ic_image)
                 .resize(800, 800)

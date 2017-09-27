@@ -101,11 +101,15 @@ public class AppModule {
     @Provides
     @Singleton
     Picasso providePicasso(Context context) {
+        return picasso(context);
+    }
+
+    Picasso picasso(final Context context) {
         return Picasso.with(context);
     }
 
     @Provides
-    GalleryAdapter provideGalleryAdapter() {
-        return new GalleryAdapter();
+    GalleryAdapter provideGalleryAdapter(Picasso picasso) {
+        return new GalleryAdapter(picasso);
     }
 }

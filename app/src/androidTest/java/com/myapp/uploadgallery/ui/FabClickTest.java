@@ -131,6 +131,41 @@ public class FabClickTest {
         onView(withId(R.id.ivManipulatorCancel)).check(doesNotExist());
     }
 
+    @Test
+    public void testFabDialogGalleryOneImageSaved() {
+        testImageSave();
+
+        //verify gallery fragment has one image
+        onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(1));
+    }
+
+    private void testImageSave() {
+        //click on fab
+        onView(withId(R.id.fab)).perform(click());
+        //verify dialog is visible
+        onView(withText(R.string.dialog_upload_title)).check(matches(isDisplayed()));
+        //click on gallery
+        onView(withText(R.string.dialog_upload_gallery)).perform(click());
+        //verify that manipulator fragment is shown
+        onView(withId(R.id.ivManipulatorSave)).check(matches(isDisplayed()));
+        //click on save
+        onView(withId(R.id.ivManipulatorSave)).perform(click());
+
+        //verify manipulator is hidden
+        onView(withId(R.id.ivManipulatorCancel)).check(doesNotExist());
+        //verify gallery fragment is shown
+        onView(withId(R.id.rvGallery)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testFabDialogGalleryTwoImagesSaved() {
+        testImageSave();
+        testImageSave();
+
+        //verify gallery fragment recyclerview has one image
+        onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(2));
+    }
+
 
     //from here:https://github.com/googlesamples/android-testing/blob/master/ui/espresso
     // /IntentsAdvancedSample/app/src/androidTest/java/com/example/android/testing/espresso

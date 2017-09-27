@@ -32,7 +32,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     @BindView(R.id.cropImageView)
     CropImageView image;
 
-    @BindView(R.id.progress)
+    @BindView(R.id.pbManipulator)
     View progress;
 
     @BindViews({R.id.ivManipulatorCancel, R.id.ivManipulatorRotateLeft,
