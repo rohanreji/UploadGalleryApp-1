@@ -180,7 +180,7 @@ public class GalleryManagerImpl extends GalleryManager {
     @Override
     public void onManipulatorClosed() {
         if (view != null) {
-            view.
+            view.onManipulatorClosed();
         }
     }
 }

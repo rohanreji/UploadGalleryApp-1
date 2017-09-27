@@ -14,6 +14,7 @@ import com.myapp.uploadgallery.manager.GalleryManagerImpl;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelperImpl;
 import com.myapp.uploadgallery.manager.UserId;
+import com.myapp.uploadgallery.ui.gallery.GalleryAdapter;
 import com.squareup.picasso.Picasso;
 
 import javax.inject.Singleton;
@@ -101,5 +102,10 @@ public class AppModule {
     @Singleton
     Picasso providePicasso(Context context) {
         return Picasso.with(context);
+    }
+
+    @Provides
+    GalleryAdapter provideGalleryAdapter() {
+        return new GalleryAdapter();
     }
 }

@@ -14,4 +14,6 @@ public interface GalleryViewable {
      * @param images images to add
      */
     void setImages(List<GalleryImage> images);
+
+    void addImage(GalleryImage image);
 }

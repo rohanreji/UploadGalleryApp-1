@@ -47,6 +47,7 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
     }
+
     @Override
     public void onActivityCreated(@Nullable final Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -58,4 +59,9 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void addImage(final GalleryImage image) {
+        adapter.addImage(image);
+        adapter.notifyDataSetChanged();
+    }
 }

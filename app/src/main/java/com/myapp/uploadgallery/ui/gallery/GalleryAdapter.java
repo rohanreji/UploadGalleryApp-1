@@ -1,5 +1,6 @@
 package com.myapp.uploadgallery.ui.gallery;
 
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +13,7 @@ import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.util.DateFormatUtils;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,11 +22,45 @@ import butterknife.ButterKnife;
  * Adapter for the gallery of uploaded images.
  */
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
-    private List<GalleryImage> images = new ArrayList<>();
+    private SortedList<GalleryImage> images;
 
-    @Inject
     public GalleryAdapter() {
         super();
+
+        images = new SortedList<GalleryImage>(GalleryImage.class,
+                new SortedList.Callback<GalleryImage>() {
+                    @Override
+                    public int compare(final GalleryImage o1, final GalleryImage o2) {
+                        return o1.compareTo(o2);
+                    }
+
+                    @Override
+                    public void onChanged(final int position, final int count) {
+                        notifyItemRangeChanged(position, count);
+                    }
+                    @Override
+                    public boolean areContentsTheSame(final GalleryImage oldItem,
+                                                      final GalleryImage newItem) {
+                        return oldItem.getUrl().equals(newItem.getUrl());
+                    }
+                    @Override
+                    public boolean areItemsTheSame(final GalleryImage item1,
+                                                   final GalleryImage item2) {
+                        return item1.getCreatedAt().equals(item2.getCreatedAt());
+                    }
+                    @Override
+                    public void onInserted(final int position, final int count) {
+                        notifyItemRangeInserted(position, count);
+                    }
+                    @Override
+                    public void onRemoved(final int position, final int count) {
+                        notifyItemRangeRemoved(position, count);
+                    }
+                    @Override
+                    public void onMoved(final int fromPosition, final int toPosition) {
+                        notifyItemMoved(fromPosition, toPosition);
+                    }
+                });
     }
 
     /**
@@ -37,8 +69,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
      * @param pics images to add
      */
     public void setImages(List<GalleryImage> pics) {
-        this.images.clear();
         this.images.addAll(pics);
+    }
+
+    public void addImage(GalleryImage image) {
+        this.images.add(image);
     }
 
     @Override

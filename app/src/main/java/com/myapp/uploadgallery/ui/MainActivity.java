@@ -27,9 +27,7 @@ import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
 import com.myapp.uploadgallery.ui.gallery.GalleryFragment;
-import com.myapp.uploadgallery.ui.gallery.GalleryViewable;
 import com.myapp.uploadgallery.ui.manipulator.ManipulatorFragment;
-import com.myapp.uploadgallery.ui.manipulator.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.util.DialogPool;
 import com.myapp.uploadgallery.util.FileUtils;
 
@@ -73,9 +71,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Inject
     SharedPreferencesHelper sharedPreferencesHelper;
 
-    private GalleryViewable galleryViewable;
-    private ManipulatorViewable manipulatorViewable;
-
     @Inject
     DialogPool dialogPool;
 
@@ -114,62 +109,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         galleryManager.onDestroy();
         galleryManager.unsubscribe();
         galleryManager.setView(null);
-    }
-
-    @OnClick(R.id.fab)
-    public void onClick() {
-        int ok = 0;
-        DialogInterface.OnClickListener okListener = null;
-        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
-            ok = R.string.dialog_upload_camera;
-            okListener = (DialogInterface dialog, int which) -> startCamera();
-        }
-        DialogInterface.OnClickListener cancelListener =
-                (DialogInterface dialog, int which) -> startGallery();
-        dialogPool.showDialog(GALLERY, this, R.string.dialog_upload_title,
-                R.string.dialog_upload_message,
-                ok, okListener, R.string.dialog_upload_gallery, cancelListener);
-    }
-
-    private void showProgress(boolean show) {
-        progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
-    }
-
-    public void startCamera() {
-        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
-                Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA},
-                    PERMISSION_REQUEST_GALLERY);
-        } else {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            takePictureIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID,
-                    FileUtils.getPictureFile(this));
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            } else {
-                Snackbar.make(fab, R.string.no_camera_resolved, Snackbar.LENGTH_INDEFINITE);
-            }
-        }
-    }
-
-    public void startGallery() {
-        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    PERMISSION_REQUEST_GALLERY);
-        } else {
-            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            if (galleryIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
-            }
-        }
     }
 
     @Override
@@ -217,51 +156,93 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         }
     }
 
-    public void showStubText() {
-        if (galleryViewable != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .remove((Fragment) galleryViewable)
-                    .commit();
-            galleryViewable = null;
+    @OnClick(R.id.fab)
+    public void onClick() {
+        int ok = 0;
+        DialogInterface.OnClickListener okListener = null;
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+            ok = R.string.dialog_upload_camera;
+            okListener = (DialogInterface dialog, int which) -> startCamera();
         }
-        emptyText.setVisibility(View.VISIBLE);
+        DialogInterface.OnClickListener cancelListener =
+                (DialogInterface dialog, int which) -> startGallery();
+        dialogPool.showDialog(GALLERY, this, R.string.dialog_upload_title,
+                R.string.dialog_upload_message,
+                ok, okListener, R.string.dialog_upload_gallery, cancelListener);
     }
 
-    public void showGallery(final List<GalleryImage> images) {
-        if (galleryViewable == null) {
-            // Create new fragment and transaction
-            GalleryFragment newFragment = new GalleryFragment();
-            android.support.v4.app.FragmentTransaction transaction =
-                    getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.flFragment, newFragment, GALLERY);
-            transaction.commit();
-            galleryViewable = newFragment;
-//            galleryViewable.setCallback(galleryManager.getGalleryListener());
-        }
-//        galleryViewable.setImages(images);
+    private void showProgress(boolean show) {
+        progressBar.setVisibility(show ? View.VISIBLE : View.INVISIBLE);
     }
 
-    public void showManipulator() {
+    private void startCamera() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    PERMISSION_REQUEST_GALLERY);
+        } else {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            Uri uri = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID,
+                    FileUtils.getPictureFile(this));
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            } else {
+                Snackbar.make(fab, R.string.no_camera_resolved, Snackbar.LENGTH_INDEFINITE);
+            }
+        }
+    }
+
+    private void startGallery() {
+        if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    PERMISSION_REQUEST_GALLERY);
+        } else {
+            Intent galleryIntent = new Intent(Intent.ACTION_PICK,
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            if (galleryIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
+            }
+        }
+    }
+
+    private void showManipulator() {
         showProgress(false);
         showFab(false);
 
         ManipulatorFragment newFragment = new ManipulatorFragment();
         android.support.v4.app.FragmentTransaction transaction =
                 getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.flFragment, newFragment, GALLERY);
+        transaction.add(R.id.flFragment, newFragment, MANIPULATOR);
         transaction.addToBackStack(MANIPULATOR);
         transaction.commit();
 
         newFragment.setManipulatorListener(galleryManager);
     }
 
-    public void showNetworkAlert(final Throwable throwable) {
+    private void showStubText() {
+        final Fragment galleryFragment = findGalleryFragment();
+        if (galleryFragment != null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .remove(galleryFragment)
+                    .commit();
+        }
+        emptyText.setVisibility(View.VISIBLE);
+    }
+
+    private void showNetworkAlert(final Throwable throwable) {
         dialogPool.showDialog(NETWORK, this, R.string.dialog_network_title,
                 R.string.dialog_network_message, android.R.string.ok, null, 0, null);
     }
 
-    public void showUploadAlert(final Throwable throwable) {
+    private void showUploadAlert(final Throwable throwable) {
         dialogPool.showDialog(MANIPULATOR, this, R.string.dialog_manipulation_title,
                 R.string.dialog_manipulation_message, android.R.string.ok, null, 0, null);
     }
@@ -281,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         if (imageList.isEmpty()) {
             showStubText();
         } else {
-            showGallery(imageList);
+            getGalleryFragment().setImages(imageList);
         }
     }
 
@@ -305,8 +286,29 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Override
     public void onUploadImageCompleted(final GalleryImage image) {
-        // TODO: 9/27/17 update gallery
         onManipulatorClosed();
+        final GalleryFragment galleryFragment = getGalleryFragment();
+        galleryFragment.addImage(image);
+    }
+
+    private GalleryFragment getGalleryFragment() {
+        final Fragment fragmentByTag = findGalleryFragment();
+        GalleryFragment fragment;
+        if (fragmentByTag == null) {
+            fragment = new GalleryFragment();
+            android.support.v4.app.FragmentTransaction transaction =
+                    getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.flFragment, fragment, GALLERY);
+            transaction.addToBackStack(MANIPULATOR);
+            transaction.commit();
+        } else {
+            fragment = (GalleryFragment) fragmentByTag;
+        }
+        return fragment;
+    }
+
+    private Fragment findGalleryFragment() {
+        return getSupportFragmentManager().findFragmentByTag(GALLERY);
     }
 
     @Override
