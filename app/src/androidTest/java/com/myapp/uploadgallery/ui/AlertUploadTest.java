@@ -10,8 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.espresso.IdlingRegistry;
-import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -43,21 +41,13 @@ import static org.hamcrest.core.AllOf.allOf;
 @RunWith(AndroidJUnit4.class)
 public class AlertUploadTest {
     private Matcher<Intent> expectedIntent = allOf(hasAction(Intent.ACTION_PICK),
-            hasData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
+            hasData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
 
     @Rule
-    public IntentsTestRule<MainActivity> mIntentsRule =
-            new IntentsTestRule<>(MainActivity.class, false, false);
+    public IntentsTestRule<MainActivity> mIntentsRule = new IntentsTestRule<>(MainActivity.class);
 
-    private IdlingResource mIdlingResource;
     @Before
     public void stubCameraIntent() {
-        TestUserId.reset();
-        mIntentsRule.launchActivity(null);
-        mIdlingResource = mIntentsRule.getActivity().getIdlingResource();
-        // To prove that the test fails, omit this call:
-        IdlingRegistry.getInstance().register(mIdlingResource);
-
         intending(not(isInternal())).respondWith(
                 new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
 
@@ -99,7 +89,6 @@ public class AlertUploadTest {
 
     @Test
     public void testFabDialogGalleryOneImageSaved() {
-        TestUserId.set("error");
         //click on fab
         onView(withId(R.id.fab)).perform(click());
         //verify dialog is visible
@@ -108,16 +97,18 @@ public class AlertUploadTest {
         onView(withText(R.string.dialog_upload_gallery)).perform(click());
         //verify that manipulator fragment is shown
         onView(withId(R.id.ivManipulatorSave)).check(matches(isDisplayed()));
+        //change to error responds
+        TestUserId.set("error");
         //click on save
         onView(withId(R.id.ivManipulatorSave)).perform(click());
 
         //verify manipulator is hidden
-        onView(withId(R.id.ivManipulatorSave)).check(doesNotExist());
-
+        onView(withId(R.id.ivManipulatorCancel)).check(doesNotExist());
         //verify gallery fragment is not shown
         onView(withId(R.id.rvGallery)).check(doesNotExist());
         //verify network alert is shown
-        onView(withText(R.string.dialog_upload_title)).check(matches(isDisplayed()));
-        onView(withText(R.string.dialog_upload_message)).check(matches(isDisplayed()));
+        onView(withText(R.string.dialog_manipulation_title)).check(matches(isDisplayed()));
+        onView(withText(R.string.dialog_manipulation_message)).check(matches(isDisplayed()));
     }
+
 }
