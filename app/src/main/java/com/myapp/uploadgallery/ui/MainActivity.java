@@ -4,8 +4,6 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,12 +20,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.myapp.uploadgallery.BuildConfig;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
+import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
 import com.myapp.uploadgallery.ui.gallery.GalleryFragment;
 import com.myapp.uploadgallery.ui.gallery.GalleryViewable;
 import com.myapp.uploadgallery.ui.manipulator.ManipulatorFragment;
@@ -35,9 +33,6 @@ import com.myapp.uploadgallery.ui.manipulator.ManipulatorViewable;
 import com.myapp.uploadgallery.ui.util.DialogPool;
 import com.myapp.uploadgallery.util.FileUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -51,7 +46,7 @@ import dagger.android.DispatchingAndroidInjector;
 import dagger.android.support.HasSupportFragmentInjector;
 
 public class MainActivity extends AppCompatActivity implements Viewable,
-        ManipulatorViewable.ManipulatorUiListener, HasSupportFragmentInjector {
+        HasSupportFragmentInjector {
     public static final int REQUEST_IMAGE_CAPTURE = 101;
     public static final int REQUEST_IMAGE_GALLERY = 102;
     public static final int PERMISSION_REQUEST_GALLERY = 103;
@@ -74,6 +69,9 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Inject
     GalleryManager galleryManager;
+
+    @Inject
+    SharedPreferencesHelper sharedPreferencesHelper;
 
     private GalleryViewable galleryViewable;
     private ManipulatorViewable manipulatorViewable;
@@ -113,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        galleryManager.onDestroy();
         galleryManager.unsubscribe();
         galleryManager.setView(null);
     }
@@ -130,34 +129,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         dialogPool.showDialog(GALLERY, this, R.string.dialog_upload_title,
                 R.string.dialog_upload_message,
                 ok, okListener, R.string.dialog_upload_gallery, cancelListener);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-//        if (manipulatorViewable == null) {
-//            galleryManager.updateImages()
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(new Consumer() {
-//                        @Override
-//                        public void accept(final Object o) throws Exception {
-//
-//                        }
-//                    }, new Consumer<Throwable>() {
-//                        @Override
-//                        public void accept(final Throwable throwable) throws Exception {
-//                            showProgress(false);
-//                            showStubText();
-//                            showNetworkAlert(throwable);
-//                        }
-//                    });
-//        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     private void showProgress(boolean show) {
@@ -235,20 +206,13 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         if (resultCode == RESULT_OK) {
             showProgress(true);
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                File file = FileUtils.getPictureFile(this);
-                Bitmap bitmap = BitmapFactory.decodeFile(file.getPath());
-                showManipulator(bitmap);
+                sharedPreferencesHelper.setImageUri(
+                        Uri.fromFile(FileUtils.getPictureFile(getApplicationContext())));
+                showManipulator();
             } else if (requestCode == REQUEST_IMAGE_GALLERY) {
-                try {
-                    final Uri imageUri = data.getData();
-                    final InputStream imageStream = getContentResolver().openInputStream(imageUri);
-                    final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                    showManipulator(selectedImage);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                            .show();
-                }
+                final Uri imageUri = data.getData();
+                sharedPreferencesHelper.setImageUri(imageUri);
+                showManipulator();
             }
         }
     }
@@ -278,21 +242,18 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 //        galleryViewable.setImages(images);
     }
 
-    public void showManipulator(Bitmap bitmap) {
+    public void showManipulator() {
         showProgress(false);
-        if (manipulatorViewable == null) {
-            ManipulatorFragment newFragment = new ManipulatorFragment();
-            android.support.v4.app.FragmentTransaction transaction =
-                    getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.flFragment, newFragment, GALLERY);
-            transaction.addToBackStack(MANIPULATOR);
-            transaction.commit();
-            manipulatorViewable = newFragment;
-//            manipulatorViewable.setManipulatorListeners(galleryManager.getManipulatorListener(),
-//                    this);
-        }
-        manipulatorViewable.setBitmapToManipulate(bitmap);
         showFab(false);
+
+        ManipulatorFragment newFragment = new ManipulatorFragment();
+        android.support.v4.app.FragmentTransaction transaction =
+                getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.flFragment, newFragment, GALLERY);
+        transaction.addToBackStack(MANIPULATOR);
+        transaction.commit();
+
+        newFragment.setManipulatorListener(galleryManager);
     }
 
     public void showNetworkAlert(final Throwable throwable) {
@@ -303,24 +264,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     public void showUploadAlert(final Throwable throwable) {
         dialogPool.showDialog(MANIPULATOR, this, R.string.dialog_manipulation_title,
                 R.string.dialog_manipulation_message, android.R.string.ok, null, 0, null);
-    }
-
-    @Override
-    public void closeManipulator() {
-        if (manipulatorViewable != null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .remove((Fragment) manipulatorViewable)
-                    .commit();
-            manipulatorViewable = null;
-        }
-        showFab(true);
-    }
-
-    @Override
-    public void onManipulationError() {
-        showProgress(false);
-        closeManipulator();
     }
 
     private void showFab(boolean show) {
@@ -345,6 +288,32 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     public void onFetchImagesError(final Throwable throwable) {
         showNetworkAlert(throwable);
+    }
+
+    @Override
+    public void onCropImageError(final Throwable throwable) {
+        showUploadAlert(throwable);
+        showProgress(false);
+        showFab(true);
+    }
+
+    @Override
+    public void onUploadImageError(final Throwable throwable) {
+        showUploadAlert(throwable);
+        showProgress(false);
+        showFab(true);
+    }
+
+    @Override
+    public void onUploadImageCompleted(final GalleryImage image) {
+        getFragmentManager().popBackStack();
+        showProgress(false);
+        showFab(true);
+    }
+
+    @Override
+    public void onUploadImageStarted() {
+        showProgress(true);
     }
 
     @Override

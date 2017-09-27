@@ -1,14 +1,25 @@
 package com.myapp.uploadgallery.manager;
 
+import android.graphics.Bitmap;
+
 import com.myapp.uploadgallery.api.GalleryEndpoint;
+import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.ui.Viewable;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
-public class GalleryManagerImpl implements GalleryManager {
+public class GalleryManagerImpl extends GalleryManager {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private Viewable view;
@@ -51,44 +62,35 @@ public class GalleryManagerImpl implements GalleryManager {
 //        }
 //    }
 
-//    private Single<File> saveBitmap(final File file, final Bitmap bitmap) {
-//        return Single.defer(() -> {
-//            OutputStream out = null;
-//            try {
-//                out = new FileOutputStream(file);
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//                if (out != null) {
-//                    try {
-//                        out.close();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//            return Single.just(file);
-//        });
-//    }
+    private Single<File> saveBitmap(final File file, final Bitmap bitmap) {
+        return Single.fromCallable(() -> {
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return file;
+        });
+    }
 
-//    private Single<GalleryImage> uploadCachedPicture(final File pictureFile) {
-//        RequestBody body =
-//                RequestBody.create(MediaType.parse("image/*"), pictureFile);
-//        MultipartBody.Part part =
-//                MultipartBody.Part.createFormData("image", pictureFile.getName(),
-//                        body);
-//
-//        return endpoint.postImageForUser(userId.get(), part)
-//                .subscribeOn(backgroundScheduler)
-//                .observeOn(mainScheduler)
-//                .doOnError((Throwable t) -> view.showUploadAlert(t))
-//                .doOnSuccess((GalleryImage image) -> {
-//                    images.add(image);
-//                    imagesUpdated();
-//                })
-//                .doOnEvent((GalleryImage ir, Throwable t) -> imagesUpdated());
-//    }
+    private Single<GalleryImage> uploadImage(final File pictureFile) {
+        RequestBody body =
+                RequestBody.create(MediaType.parse("image/*"), pictureFile);
+        MultipartBody.Part part =
+                MultipartBody.Part.createFormData("image", pictureFile.getName(),
+                        body);
+        return endpoint.postImageForUser(userId.get(), part);
+    }
 
 //    @Override
 //    public GalleryViewable.GalleryListener getGalleryListener() {
@@ -139,11 +141,6 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
-    public void uploadImage() {
-
-    }
-
-    @Override
     public void subscribe() {
         loadImages();
     }
@@ -157,5 +154,26 @@ public class GalleryManagerImpl implements GalleryManager {
     public void onDestroy() {
         this.view = null;
         // TODO: 9/25/17 destroy other dependencies
+    }
+
+    @Override
+    public void onManipulatorCropped(final File aFile, final Single<Bitmap> cropOperation) {
+        subscriptions.clear();
+        view.onUploadImageStarted();
+        Disposable disposable = cropOperation
+                .flatMap((Bitmap bitmap) -> saveBitmap(aFile, bitmap))
+                .flatMap((File file) -> uploadImage(file))
+                .subscribeOn(backgroundScheduler)
+                .observeOn(mainScheduler)
+                .subscribe((GalleryImage imageResponse) -> {
+                    if (null != view) {
+                        view.onUploadImageCompleted(imageResponse);
+                    }
+                }, (Throwable throwable) -> {
+                    if (null != view) {
+                        view.onUploadImageError(throwable);
+                    }
+                });
+        subscriptions.add(disposable);
     }
 }

@@ -1,6 +1,7 @@
 package com.myapp.uploadgallery.ui.manipulator;
 
-import android.graphics.Bitmap;
+import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,13 +10,17 @@ import android.view.ViewGroup;
 
 import com.isseiaoki.simplecropview.CropImageView;
 import com.myapp.uploadgallery.R;
+import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
+import dagger.android.support.AndroidSupportInjection;
 
 import static com.myapp.uploadgallery.util.FileUtils.getPictureFile;
 
@@ -29,9 +34,13 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     @BindView(R.id.progress)
     View progress;
 
+    @Inject
+    SharedPreferencesHelper sharedPreferencesHelper;
+
+    @Inject
+    Picasso picasso;
+
     private ManipulatorListener listener;
-    private ManipulatorUiListener uiListener;
-    private Bitmap bitmap;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,77 +50,45 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
         image.setCropMode(CropImageView.CropMode.FREE);
 
-        if (null != bitmap) {
-            setBitmapToManipulate(bitmap);
-            bitmap = null;
-        }
+        picasso.load(sharedPreferencesHelper.getImageUri())
+                .placeholder(R.drawable.ic_image)
+                .resize(800, 800)
+                .centerInside()
+                .into(image);
 
         return view;
     }
 
     @Override
-    public void setBitmapToManipulate(final Bitmap bitmap) {
-        if (null != image) {
-            image.setLoggingEnabled(true);
-            image.setImageBitmap(bitmap);
-        } else {
-            this.bitmap = bitmap;
-        }
+    public void onAttach(final Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 
     @Override
-    public void setManipulatorListeners(final ManipulatorListener listener,
-                                        final ManipulatorUiListener uilistener) {
+    public void setManipulatorListener(final ManipulatorListener listener) {
         this.listener = listener;
-        this.uiListener = uilistener;
     }
 
     @OnClick(R.id.ivManipulatorCancel)
     public void close() {
-        if (null != uiListener) {
-            uiListener.closeManipulator();
-        }
+        getFragmentManager().popBackStack();
     }
 
     @OnClick(R.id.ivManipulatorSave)
     public void save() {
         progress.setVisibility(View.VISIBLE);
-        image.cropAsSingle()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<Bitmap>() {
-                    @Override
-                    public void accept(@io.reactivex.annotations.NonNull Bitmap bitmap) throws
-                            Exception {
-                        if (null != uiListener) {
-                            uiListener.closeManipulator();
-                        }
-                        if (null != listener) {
-                            listener.onManipulatorCropped(getPictureFile(getContext()), bitmap);
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(@io.reactivex.annotations.NonNull Throwable throwable)
-                            throws Exception {
-                        if (null != uiListener) {
-                            uiListener.onManipulationError();
-                        }
-                    }
-                });
+        final File pictureFile = getPictureFile(getContext());
+        listener.onManipulatorCropped(pictureFile, image.cropAsSingle(Uri.fromFile(pictureFile)));
     }
 
     @OnClick(R.id.ivManipulatorRotateLeft)
     public void rotateLeft() {
-        if (null != image) {
-            image.rotateImage(CropImageView.RotateDegrees.ROTATE_M90D, 1000);
-        }
+        image.rotateImage(CropImageView.RotateDegrees.ROTATE_M90D, 1000);
     }
 
     @OnClick(R.id.ivManipulatorRotateRight)
     public void rotateRight() {
-        if (null != image) {
-            image.rotateImage(CropImageView.RotateDegrees.ROTATE_90D, 1000);
-        }
+        image.rotateImage(CropImageView.RotateDegrees.ROTATE_90D, 1000);
     }
 }

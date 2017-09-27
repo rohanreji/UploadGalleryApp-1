@@ -11,4 +11,8 @@ public interface Viewable {
     void onFetchImagesStarted();
     void onFetchImagesCompleted(List<GalleryImage> imageList);
     void onFetchImagesError(Throwable throwable);
+    void onCropImageError(Throwable throwable);
+    void onUploadImageError(Throwable throwable);
+    void onUploadImageCompleted(GalleryImage image);
+    void onUploadImageStarted();
 }

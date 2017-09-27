@@ -11,7 +11,10 @@ import com.myapp.uploadgallery.GalleryApp;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.manager.GalleryManager;
 import com.myapp.uploadgallery.manager.GalleryManagerImpl;
+import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
+import com.myapp.uploadgallery.manager.SharedPreferencesHelperImpl;
 import com.myapp.uploadgallery.manager.UserId;
+import com.squareup.picasso.Picasso;
 
 import javax.inject.Singleton;
 
@@ -86,5 +89,17 @@ public class AppModule {
     GalleryManager provideGalleryManager(GalleryEndpoint endpoint, UserId userId) {
         return new GalleryManagerImpl(userId, endpoint,
                 Schedulers.io(), AndroidSchedulers.mainThread());
+    }
+
+    @Provides
+    @Singleton
+    SharedPreferencesHelper provideSharedPreferencesHelper() {
+        return new SharedPreferencesHelperImpl(getSharedPreferences());
+    }
+
+    @Provides
+    @Singleton
+    Picasso providePicasso(Context context) {
+        return Picasso.with(context);
     }
 }
