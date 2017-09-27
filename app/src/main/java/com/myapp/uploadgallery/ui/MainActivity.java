@@ -9,8 +9,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.test.espresso.IdlingResource;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +30,7 @@ import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
+import com.myapp.uploadgallery.test.GalleryIdlingResource;
 import com.myapp.uploadgallery.ui.gallery.GalleryAdapter;
 import com.myapp.uploadgallery.ui.gallery.GalleryFragment;
 import com.myapp.uploadgallery.ui.manipulator.ManipulatorFragment;
@@ -81,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Inject
     DispatchingAndroidInjector<Fragment> fragmentInjector;
 
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private GalleryIdlingResource mIdlingResource;
+
     private View.OnClickListener settingsListener = new View.OnClickListener() {
         @Override
         public void onClick(final View view) {
@@ -104,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         setSupportActionBar(toolbar);
 
         galleryManager.setView(this);
-        galleryManager.subscribe();
+        galleryManager.subscribe(mIdlingResource);
     }
 
     @Override
@@ -226,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         transaction.addToBackStack(MANIPULATOR);
         transaction.commit();
 
-        newFragment.setManipulatorListener(galleryManager);
+        newFragment.setManipulatorListener(mIdlingResource, galleryManager);
     }
 
     private void showStubText() {
@@ -328,5 +337,17 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     public AndroidInjector<Fragment> supportFragmentInjector() {
         return fragmentInjector;
+    }
+
+    /**
+     * Only called from test, creates and returns a new {@link GalleryIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new GalleryIdlingResource();
+        }
+        return mIdlingResource;
     }
 }

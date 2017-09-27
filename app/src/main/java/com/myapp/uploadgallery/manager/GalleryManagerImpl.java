@@ -1,10 +1,12 @@
 package com.myapp.uploadgallery.manager;
 
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.api.ImageResponse;
+import com.myapp.uploadgallery.test.GalleryIdlingResource;
 import com.myapp.uploadgallery.ui.Viewable;
 
 import java.io.File;
@@ -42,28 +44,35 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
-    public void loadImages() {
+    public void loadImages(@Nullable final GalleryIdlingResource idlingResource) {
         view.onFetchImagesStarted();
         subscriptions.clear();
 
         Disposable disposable = endpoint.getImagesForUser(userId.get())
+                .doOnSubscribe((Disposable disposable1) -> {
+                    GalleryIdlingResource.set(idlingResource, true);
+                })
                 .subscribeOn(backgroundScheduler)
                 .observeOn(mainScheduler)
                 .subscribe((ImageResponse imageResponse) -> {
                     if (null != view) {
                         view.onFetchImagesCompleted(imageResponse.getImages());
                     }
+
+                    GalleryIdlingResource.set(idlingResource, false);
                 }, (Throwable throwable) -> {
                     if (null != view) {
                         view.onFetchImagesError(throwable);
                     }
+
+                    GalleryIdlingResource.set(idlingResource, false);
                 });
         subscriptions.add(disposable);
     }
 
     @Override
-    public void subscribe() {
-        loadImages();
+    public void subscribe(@Nullable final GalleryIdlingResource idlingResource) {
+        loadImages(idlingResource);
     }
 
     @Override
@@ -79,9 +88,12 @@ public class GalleryManagerImpl implements GalleryManager {
     }
 
     @Override
-    public void onManipulatorCropped(final File aFile, final Single<Bitmap> cropOperation) {
+    public void onManipulatorCropped(@Nullable final GalleryIdlingResource idlingResource,
+                                     final File aFile, final Single<Bitmap> cropOperation) {
         subscriptions.clear();
         view.onUploadImageStarted();
+
+        GalleryIdlingResource.set(idlingResource, true);
         Disposable disposable = cropOperation
                 .flatMap((Bitmap bitmap) -> saveBitmap(aFile, bitmap))
                 .flatMap((File file) -> uploadImage(file))
@@ -91,10 +103,15 @@ public class GalleryManagerImpl implements GalleryManager {
                     if (null != view) {
                         view.onUploadImageCompleted(imageResponse);
                     }
+
+                    GalleryIdlingResource.set(idlingResource, false);
                 }, (Throwable throwable) -> {
                     if (null != view) {
                         view.onUploadImageError(throwable);
                     }
+
+
+                    GalleryIdlingResource.set(idlingResource, false);
                 });
         subscriptions.add(disposable);
     }

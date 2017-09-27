@@ -1,6 +1,9 @@
 package com.myapp.uploadgallery.ui.manipulator;
 
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
+
+import com.myapp.uploadgallery.test.GalleryIdlingResource;
 
 import java.io.File;
 
@@ -15,7 +18,8 @@ public interface ManipulatorViewable {
      *
      * @param listener listener that is responsible for saving and uploading image
      */
-    void setManipulatorListener(ManipulatorListener listener);
+    void setManipulatorListener(@Nullable final GalleryIdlingResource idlingResource,
+                                ManipulatorListener listener);
 
     /**
      * Defines callback for manipulations listener.
@@ -24,9 +28,10 @@ public interface ManipulatorViewable {
         /**
          * Called when image is manipulated and ready to save and upload.
          *
-         * @param cropOperation   observable that performs crop operation (hot)
+         * @param cropOperation observable that performs crop operation (hot)
          */
-        void onManipulatorCropped(File file, Single<Bitmap> cropOperation);
+        void onManipulatorCropped(@Nullable final GalleryIdlingResource idlingResource,
+                                  File file, Single<Bitmap> cropOperation);
 
         void onManipulatorClosed();
     }

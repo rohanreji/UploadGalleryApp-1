@@ -3,6 +3,7 @@ package com.myapp.uploadgallery.ui.manipulator;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,8 @@ import android.view.ViewGroup;
 import com.isseiaoki.simplecropview.CropImageView;
 import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
+import com.myapp.uploadgallery.test.GalleryIdlingResource;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -46,6 +49,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     Picasso picasso;
 
     private ManipulatorListener listener;
+    private GalleryIdlingResource idlingResource;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,11 +59,21 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
         image.setCropMode(CropImageView.CropMode.FREE);
 
+        GalleryIdlingResource.set(idlingResource, true);
         picasso.load(sharedPreferencesHelper.getImageUri())
                 .placeholder(R.drawable.ic_image)
                 .resize(800, 800)
                 .centerInside()
-                .into(image);
+                .into(image, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        GalleryIdlingResource.set(idlingResource, false);
+                    }
+                    @Override
+                    public void onError() {
+                        GalleryIdlingResource.set(idlingResource, false);
+                    }
+                });
 
         return view;
     }
@@ -71,8 +85,10 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     }
 
     @Override
-    public void setManipulatorListener(final ManipulatorListener listener) {
+    public void setManipulatorListener(@Nullable final GalleryIdlingResource idlingResource,
+                                       final ManipulatorListener listener) {
         this.listener = listener;
+        this.idlingResource = idlingResource;
     }
 
     @OnClick(R.id.ivManipulatorCancel)
@@ -82,6 +98,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
     @OnClick(R.id.ivManipulatorSave)
     public void save() {
+        GalleryIdlingResource.set(idlingResource, true);
         progress.setVisibility(View.VISIBLE);
         ButterKnife.apply(controlViews, new ButterKnife.Action<View>() {
             @Override
@@ -90,7 +107,8 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                 view.setClickable(false);
             }
         });
-        listener.onManipulatorCropped(getPictureFile(getContext()), image.cropAsSingle());
+        listener.onManipulatorCropped(idlingResource,
+                getPictureFile(getContext()), image.cropAsSingle());
     }
 
     @OnClick(R.id.ivManipulatorRotateLeft)
