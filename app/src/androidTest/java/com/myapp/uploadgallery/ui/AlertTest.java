@@ -19,6 +19,7 @@ import static android.support.test.espresso.assertion.ViewAssertions.doesNotExis
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
 
 @RunWith(AndroidJUnit4.class)
 public class AlertTest {
@@ -43,8 +44,8 @@ public class AlertTest {
         //verify gallery fragment is not shown
         onView(withId(R.id.rvGallery)).check(doesNotExist());
         //verify network alert is shown
-        onView(withId(android.R.string.ok)).check(matches(isDisplayed()));
-//        onView(withId(R.string.dialog_network_message)).check(matches(isDisplayed()));
+        onView(withText(R.string.dialog_network_title)).check(matches(isDisplayed()));
+        onView(withText(R.string.dialog_network_message)).check(matches(isDisplayed()));
     }
 
     @After
