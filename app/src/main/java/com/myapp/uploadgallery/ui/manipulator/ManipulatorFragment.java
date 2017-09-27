@@ -60,6 +60,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
         image.setCropMode(CropImageView.CropMode.FREE);
 
         GalleryIdlingResource.set(idlingResource, true);
+        progress.setVisibility(View.VISIBLE);
         picasso.load(sharedPreferencesHelper.getImageUri())
                 .placeholder(R.drawable.ic_image)
                 .resize(800, 800)
@@ -67,10 +68,12 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                 .into(image, new Callback() {
                     @Override
                     public void onSuccess() {
+                        progress.setVisibility(View.GONE);
                         GalleryIdlingResource.set(idlingResource, false);
                     }
                     @Override
                     public void onError() {
+                        progress.setVisibility(View.GONE);
                         GalleryIdlingResource.set(idlingResource, false);
                     }
                 });
