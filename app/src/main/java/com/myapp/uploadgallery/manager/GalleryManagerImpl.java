@@ -19,7 +19,7 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 
-public class GalleryManagerImpl extends GalleryManager {
+public class GalleryManagerImpl implements GalleryManager {
     private final UserId userId;
     private final GalleryEndpoint endpoint;
     private Viewable view;
@@ -40,58 +40,6 @@ public class GalleryManagerImpl extends GalleryManager {
     public void setView(Viewable view) {
         this.view = view;
     }
-
-//    @Override
-//    public Single updateImages() {
-//        return endpoint.getImagesForUser(userId.get())
-//                .subscribeOn(backgroundScheduler)
-//                .observeOn(mainScheduler)
-//                .doOnSubscribe((Disposable disposable) -> view.showProgress(true))
-//                .doOnSuccess((ImageResponse imageResponse)
-//                        -> images.addAll(imageResponse.getImages()))
-//                .doOnError((Throwable throwable) -> view.showNetworkAlert(throwable))
-//                .doOnEvent((ImageResponse ir, Throwable t) -> imagesUpdated());
-//    }
-
-//    private void imagesUpdated() {
-//        if (images.size() == 0) {
-//            view.showProgress(false);
-//            view.showStubText();
-//        } else {
-//            view.showGallery(images);
-//        }
-//    }
-
-    private Single<File> saveBitmap(final File file, final Bitmap bitmap) {
-        return Single.fromCallable(() -> {
-            OutputStream out = null;
-            try {
-                out = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            return file;
-        });
-    }
-
-    private Single<GalleryImage> uploadImage(final File pictureFile) {
-        RequestBody body =
-                RequestBody.create(MediaType.parse("image/*"), pictureFile);
-        MultipartBody.Part part =
-                MultipartBody.Part.createFormData("image", pictureFile.getName(),
-                        body);
-        return endpoint.postImageForUser(userId.get(), part);
-    }
-
 
     @Override
     public void loadImages() {
@@ -124,6 +72,13 @@ public class GalleryManagerImpl extends GalleryManager {
     }
 
     @Override
+    public void onManipulatorClosed() {
+        if (view != null) {
+            view.onManipulatorClosed();
+        }
+    }
+
+    @Override
     public void onManipulatorCropped(final File aFile, final Single<Bitmap> cropOperation) {
         subscriptions.clear();
         view.onUploadImageStarted();
@@ -144,10 +99,33 @@ public class GalleryManagerImpl extends GalleryManager {
         subscriptions.add(disposable);
     }
 
-    @Override
-    public void onManipulatorClosed() {
-        if (view != null) {
-            view.onManipulatorClosed();
-        }
+    private Single<File> saveBitmap(final File file, final Bitmap bitmap) {
+        return Single.fromCallable(() -> {
+            OutputStream out = null;
+            try {
+                out = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (out != null) {
+                    try {
+                        out.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return file;
+        });
+    }
+
+    private Single<GalleryImage> uploadImage(final File pictureFile) {
+        RequestBody body =
+                RequestBody.create(MediaType.parse("image/*"), pictureFile);
+        MultipartBody.Part part =
+                MultipartBody.Part.createFormData("image", pictureFile.getName(),
+                        body);
+        return endpoint.postImageForUser(userId.get(), part);
     }
 }
