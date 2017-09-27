@@ -1,5 +1,7 @@
 package com.myapp.uploadgallery.ui;
 
+import android.support.test.espresso.IdlingRegistry;
+import android.support.test.espresso.IdlingResource;
 import android.support.test.espresso.matcher.BoundedMatcher;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -10,6 +12,7 @@ import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.manager.TestUserId;
 
 import org.hamcrest.Description;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,27 +31,30 @@ public class GalleryFragmentNotEmptyTest {
             new ActivityTestRule<>(
                     MainActivity.class);
 
+    private IdlingResource mIdlingResource;
+
     @Before
     public void setup() {
         TestUserId.set("user2");
-    }
 
-    @Test
-    public void testOnePicGallery() {
-        TestUserId.set("user1");
-        //verify gallery fragment is shown
-        onView(withId(R.id.rvGallery)).check(matches(isDisplayed()));
-        //verify gallery has 1 image
-        onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(1));
+        mIdlingResource = mActivityRule.getActivity().getIdlingResource();
+        // To prove that the test fails, omit this call:
+        IdlingRegistry.getInstance().register(mIdlingResource);
     }
 
     @Test
     public void testManyPicGallery() {
-        TestUserId.set("user2");
         //verify gallery fragment is shown
         onView(withId(R.id.rvGallery)).check(matches(isDisplayed()));
         //verify gallery has 1 image
         onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(greaterThan(1)));
+    }
+
+    @After
+    public void unregisterIdlingResource() {
+        if (mIdlingResource != null) {
+            IdlingRegistry.getInstance().unregister(mIdlingResource);
+        }
     }
 
     //from here:https://github.com/googlesamples/android-testing/blob/master/ui/espresso

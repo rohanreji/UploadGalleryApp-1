@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.api.ImageResponse;
+import com.myapp.uploadgallery.test.GalleryIdlingResource;
 import com.myapp.uploadgallery.ui.Viewable;
 
 import org.junit.Before;
@@ -49,6 +50,9 @@ public class GalleryManagerSuccessfulTest {
     @Mock
     Context context;
 
+    @Mock
+    GalleryIdlingResource resource;
+
     GalleryManager manager;
 
     private String userIdValue = "user1";
@@ -70,7 +74,7 @@ public class GalleryManagerSuccessfulTest {
         item.setImages(img1);
         when(endpoint.getImagesForUser(userIdValue)).thenReturn(Single.just(item));
 
-        manager.loadImages();
+        manager.loadImages(resource);
 
         InOrder inOrder = Mockito.inOrder(view);
         inOrder.verify(view, times(1)).onFetchImagesStarted();
@@ -83,7 +87,7 @@ public class GalleryManagerSuccessfulTest {
         item.setImages();
         when(endpoint.getImagesForUser(userIdValue)).thenReturn(Single.just(item));
 
-        manager.loadImages();
+        manager.loadImages(resource);
 
         InOrder inOrder = Mockito.inOrder(view);
         inOrder.verify(view, times(1)).onFetchImagesStarted();
@@ -107,7 +111,7 @@ public class GalleryManagerSuccessfulTest {
         }
 
         when(endpoint.postImageForUser(eq(userIdValue), any())).thenReturn(Single.just(img1));
-        manager.onManipulatorCropped(file, Single.just(bitmap));
+        manager.onManipulatorCropped(resource, file, Single.just(bitmap));
 
         InOrder inOrder = Mockito.inOrder(view);
         inOrder.verify(view, times(1)).onUploadImageStarted();
