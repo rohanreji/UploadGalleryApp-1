@@ -33,6 +33,9 @@ public class TestGalleryEndpoint implements GalleryEndpoint {
                 item.setImages(img1, img2, img3);
                 return Single.just(item);
             }
+            case "error": {
+                return Single.error(new Exception());
+            }
             default: {
                 final ImageResponse item = new ImageResponse();
                 item.setImages();
@@ -43,6 +46,10 @@ public class TestGalleryEndpoint implements GalleryEndpoint {
     @Override
     public Single<GalleryImage> postImageForUser(@Path("userId") final String userId,
                                                  @Part final MultipartBody.Part image) {
+        if ("error".equals(userId)) {
+            return Single.error(new Exception());
+        }
+
         DateTime dateTime = new DateTime();
         GalleryImage img = new GalleryImage("http://placehold.it/120x120&text=image" + (++imageId),
                 dateTime.toString(formatter));
