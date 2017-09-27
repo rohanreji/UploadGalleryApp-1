@@ -1,9 +1,18 @@
 package com.myapp.uploadgallery.ui;
 
+import android.app.Activity;
+import android.app.Instrumentation;
+import android.content.ContentResolver;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.test.espresso.IdlingRegistry;
 import android.support.test.espresso.IdlingResource;
+import android.support.test.espresso.intent.rule.IntentsTestRule;
 import android.support.test.espresso.matcher.BoundedMatcher;
-import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,23 +27,68 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.assertion.ViewAssertions.doesNotExist;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.intent.Intents.intending;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static android.support.test.espresso.intent.matcher.IntentMatchers.isInternal;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.CoreMatchers.not;
 
 @RunWith(AndroidJUnit4.class)
 public class AlertTest {
-    @Rule
-    public ActivityTestRule<MainActivity> mActivityRule =
-            new ActivityTestRule<>(
-                    MainActivity.class, false, false);
 
     private IdlingResource mIdlingResource;
 
+    @Rule
+    public IntentsTestRule<MainActivity> mIntentsRule =
+            new IntentsTestRule<>(MainActivity.class, false, false);
+
     @Before
-    public void setup() {
+    public void stubCameraIntent() {
         TestUserId.set("error");
+
+        intending(not(isInternal())).respondWith(
+                new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
+
+        Instrumentation.ActivityResult cameraResult = createImageCaptureActivityResultStub();
+        intending(hasAction(MediaStore.ACTION_IMAGE_CAPTURE)).respondWith(cameraResult);
+
+        Instrumentation.ActivityResult galleryResult = createImageCaptureActivityResultStub();
+        intending(expectedIntent).respondWith(galleryResult);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getInstrumentation().getUiAutomation().executeShellCommand(
+                    "pm grant " + getTargetContext().getPackageName()
+                            + " android.permission.READ_EXTERNAL_STORAGE");
+            getInstrumentation().getUiAutomation().executeShellCommand(
+                    "pm grant " + getTargetContext().getPackageName()
+                            + " android.permission.WRITE_EXTERNAL_STORAGE");
+            getInstrumentation().getUiAutomation().executeShellCommand(
+                    "pm grant " + getTargetContext().getPackageName()
+                            + " android.permission.CAMERA");
+        }
+    }
+
+    private Instrumentation.ActivityResult createImageCaptureActivityResultStub() {
+        Bundle bundle = new Bundle();
+
+        Resources resources = getTargetContext().getResources();
+        Uri imageUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
+                resources.getResourcePackageName(R.mipmap.ic_launcher) + '/' +
+                resources.getResourceTypeName(R.mipmap.ic_launcher) + '/' +
+                resources.getResourceEntryName(R.mipmap.ic_launcher));
+        bundle.putParcelable(MainActivity.MANIPULATOR, imageUri);
+
+        Intent resultData = new Intent();
+        resultData.setData(imageUri);
+        resultData.putExtras(bundle);
+
+        return new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData);
     }
 
     @Test
@@ -43,8 +97,21 @@ public class AlertTest {
 
         //verify gallery fragment is not shown
         onView(withId(R.id.rvGallery)).check(doesNotExist());
-        //verify gallery has 1 image
-        onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(greaterThan(1)));
+        //verify network alert is shown
+        onView(withId(R.string.dialog_network_title)).check(matches(isDisplayed()));
+        onView(withId(R.string.dialog_network_message)).check(matches(isDisplayed()));
+    }
+
+    @Test
+    public void testUploadImagesAlert() {
+        launchActivity();
+
+        //verify gallery fragment is not shown
+        onView(withId(R.id.rvGallery)).check(doesNotExist());
+        //dismiss network alert
+        onView(withId(android.R.string.ok)).perform(click());
+
+
     }
 
     private void launchActivity() {

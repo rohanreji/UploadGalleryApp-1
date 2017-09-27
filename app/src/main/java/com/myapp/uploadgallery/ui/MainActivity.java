@@ -291,13 +291,9 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Override
     public void onFetchImagesError(final Throwable throwable) {
+        showProgress(false);
+        showStubText();
         showNetworkAlert(throwable);
-    }
-
-    @Override
-    public void onCropImageError(final Throwable throwable) {
-        onManipulatorClosed();
-        showUploadAlert(throwable);
     }
 
     @Override
