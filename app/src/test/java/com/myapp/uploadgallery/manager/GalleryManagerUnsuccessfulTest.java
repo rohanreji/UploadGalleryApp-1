@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 
 import com.myapp.uploadgallery.api.GalleryEndpoint;
 import com.myapp.uploadgallery.api.GalleryImage;
-import com.myapp.uploadgallery.api.ImageResponse;
 import com.myapp.uploadgallery.ui.Viewable;
 
 import org.junit.Before;
@@ -52,70 +51,32 @@ public class GalleryManagerUnsuccessfulTest {
     GalleryManager manager;
 
     private String userIdValue = "user1";
+    private GalleryImage img1 = new GalleryImage("http://placehold.it/120x120&text=image1",
+            "2017-09-18T15:14:20Z");
+    private Exception exception = new Exception();
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-
-
         when(this.userId.get()).thenReturn(userIdValue);
-    }
-
-    @Test
-    public void testLoadImagesSuccessful() {
-        final GalleryImage img1 = new GalleryImage("http://placehold.it/120x120&text=image1",
-                "2017-09-18T15:14:20Z");
-        final ImageResponse item = new ImageResponse();
-        item.setImages(img1);
-        when(endpoint.getImagesForUser(userIdValue)).thenReturn(Single.just(item));
 
         manager = new GalleryManagerImpl(this.userId, endpoint,
                 Schedulers.trampoline(), Schedulers.trampoline());
         manager.setView(view);
-        manager.loadImages();
-        InOrder inOrder = Mockito.inOrder(view);
-        inOrder.verify(view, times(1)).onFetchImagesStarted();
-
-        inOrder.verify(view, times(1)).onFetchImagesCompleted(item.getImages());
-    }
-
-    @Test
-    public void testLoadEmptyImages() {
-        final ImageResponse item = new ImageResponse();
-        item.setImages();
-        when(endpoint.getImagesForUser(userIdValue)).thenReturn(Single.just(item));
-
-        manager = new GalleryManagerImpl(this.userId, endpoint,
-                Schedulers.trampoline(), Schedulers.trampoline());
-        manager.setView(view);
-        manager.loadImages();
-        InOrder inOrder = Mockito.inOrder(view);
-        inOrder.verify(view, times(1)).onFetchImagesStarted();
-
-        inOrder.verify(view, times(1)).onFetchImagesCompleted(item.getImages());
     }
 
     @Test
     public void testLoadImagesNotSuccessful() {
-        Exception exception = new Exception();
         when(endpoint.getImagesForUser(userIdValue)).thenReturn(Single.error(exception));
 
-        manager = new GalleryManagerImpl(this.userId, endpoint,
-                Schedulers.trampoline(), Schedulers.trampoline());
-        manager.setView(view);
         manager.loadImages();
+
         InOrder inOrder = Mockito.inOrder(view);
         inOrder.verify(view, times(1)).onFetchImagesStarted();
-
         inOrder.verify(view, times(1)).onFetchImagesError(exception);
     }
 
     @Test
     public void testImageUpload() {
-
-        manager = new GalleryManagerImpl(this.userId, endpoint,
-                Schedulers.trampoline(), Schedulers.trampoline());
-        manager.setView(view);
-
         Bitmap bitmap = Mockito.mock(Bitmap.class);
         Mockito.when(
                 bitmap.compress((Bitmap.CompressFormat) any(), Mockito.anyInt(),
@@ -130,14 +91,11 @@ public class GalleryManagerUnsuccessfulTest {
             file = null;
         }
 
-        final GalleryImage img1 = new GalleryImage("http://placehold.it/120x120&text=image1",
-                "2017-09-18T15:14:20Z");
-        when(endpoint.postImageForUser(eq(userIdValue), any())).thenReturn(Single.just(img1));
+        when(endpoint.postImageForUser(eq(userIdValue), any())).thenReturn(Single.error(exception));
         manager.onManipulatorCropped(file, Single.just(bitmap));
 
         InOrder inOrder = Mockito.inOrder(view);
         inOrder.verify(view, times(1)).onUploadImageStarted();
-
-        inOrder.verify(view, times(1)).onUploadImageCompleted(img1);
+        inOrder.verify(view, times(1)).onUploadImageError(exception);
     }
 }
