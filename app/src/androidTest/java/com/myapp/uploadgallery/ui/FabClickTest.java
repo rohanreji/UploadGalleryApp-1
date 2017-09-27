@@ -139,7 +139,7 @@ public class FabClickTest {
         onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(1));
     }
 
-    private void testImageSave() {
+    void testImageSave() {
         //click on fab
         onView(withId(R.id.fab)).perform(click());
         //verify dialog is visible
@@ -165,7 +165,6 @@ public class FabClickTest {
         //verify gallery fragment recyclerview has 2 images
         onView(withId(R.id.rvGallery)).check(new RecyclerViewAssertion(2));
     }
-
 
     //from here:https://github.com/googlesamples/android-testing/blob/master/ui/espresso
     // /IntentsAdvancedSample/app/src/androidTest/java/com/example/android/testing/espresso
