@@ -107,6 +107,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
                 view.setClickable(false);
             }
         });
+        close();
         listener.onManipulatorCropped(idlingResource,
                 getPictureFile(getContext()), image.cropAsSingle());
     }

@@ -155,7 +155,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
                                     final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            showProgress(true);
             if (requestCode == REQUEST_IMAGE_CAPTURE) {
                 sharedPreferencesHelper.setImageUri(
                         Uri.fromFile(FileUtils.getPictureFile(getApplicationContext())));
@@ -170,6 +169,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @OnClick(R.id.fab)
     public void onClick() {
+        showProgress(false);
         int ok = 0;
         DialogInterface.OnClickListener okListener = null;
         if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
