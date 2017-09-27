@@ -26,6 +26,7 @@ import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.api.GalleryImage;
 import com.myapp.uploadgallery.manager.GalleryManager;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
+import com.myapp.uploadgallery.ui.gallery.GalleryAdapter;
 import com.myapp.uploadgallery.ui.gallery.GalleryFragment;
 import com.myapp.uploadgallery.ui.manipulator.ManipulatorFragment;
 import com.myapp.uploadgallery.ui.util.DialogPool;
@@ -67,6 +68,9 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Inject
     GalleryManager galleryManager;
+
+    @Inject
+    GalleryAdapter galleryAdapter;
 
     @Inject
     SharedPreferencesHelper sharedPreferencesHelper;
@@ -219,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         ManipulatorFragment newFragment = new ManipulatorFragment();
         android.support.v4.app.FragmentTransaction transaction =
                 getSupportFragmentManager().beginTransaction();
-        transaction.add(R.id.flFragment, newFragment, MANIPULATOR);
+        transaction.add(R.id.flCropFragment, newFragment, MANIPULATOR);
         transaction.addToBackStack(MANIPULATOR);
         transaction.commit();
 
@@ -262,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         if (imageList.isEmpty()) {
             showStubText();
         } else {
-            getGalleryFragment().setImages(imageList);
+            showGalleryFragment();
+            galleryAdapter.setImages(imageList);
         }
     }
 
@@ -273,25 +278,24 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Override
     public void onCropImageError(final Throwable throwable) {
+        onManipulatorClosed();
         showUploadAlert(throwable);
-        showProgress(false);
-        showFab(true);
     }
 
     @Override
     public void onUploadImageError(final Throwable throwable) {
-        showUploadAlert(throwable);
         onManipulatorClosed();
+        showUploadAlert(throwable);
     }
 
     @Override
     public void onUploadImageCompleted(final GalleryImage image) {
         onManipulatorClosed();
-        final GalleryFragment galleryFragment = getGalleryFragment();
-        galleryFragment.addImage(image);
+        galleryAdapter.addImage(image);
+        showGalleryFragment();
     }
 
-    private GalleryFragment getGalleryFragment() {
+    private GalleryFragment showGalleryFragment() {
         final Fragment fragmentByTag = findGalleryFragment();
         GalleryFragment fragment;
         if (fragmentByTag == null) {
@@ -299,8 +303,8 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             android.support.v4.app.FragmentTransaction transaction =
                     getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.flFragment, fragment, GALLERY);
-            transaction.addToBackStack(MANIPULATOR);
             transaction.commit();
+            fragment.setAdapter(galleryAdapter);
         } else {
             fragment = (GalleryFragment) fragmentByTag;
         }
@@ -313,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements Viewable,
 
     @Override
     public void onManipulatorClosed() {
-        getFragmentManager().popBackStack();
+        getSupportFragmentManager().popBackStack();
         showProgress(false);
         showFab(true);
     }

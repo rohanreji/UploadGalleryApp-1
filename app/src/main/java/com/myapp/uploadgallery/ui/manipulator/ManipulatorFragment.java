@@ -1,8 +1,8 @@
 package com.myapp.uploadgallery.ui.manipulator;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +13,12 @@ import com.myapp.uploadgallery.R;
 import com.myapp.uploadgallery.manager.SharedPreferencesHelper;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import dagger.android.support.AndroidSupportInjection;
@@ -33,6 +34,10 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
     @BindView(R.id.progress)
     View progress;
+
+    @BindViews({R.id.ivManipulatorCancel, R.id.ivManipulatorRotateLeft,
+            R.id.ivManipulatorRotateRight, R.id.ivManipulatorSave})
+    List<View> controlViews;
 
     @Inject
     SharedPreferencesHelper sharedPreferencesHelper;
@@ -78,8 +83,14 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
     @OnClick(R.id.ivManipulatorSave)
     public void save() {
         progress.setVisibility(View.VISIBLE);
-        final File pictureFile = getPictureFile(getContext());
-        listener.onManipulatorCropped(pictureFile, image.cropAsSingle(Uri.fromFile(pictureFile)));
+        ButterKnife.apply(controlViews, new ButterKnife.Action<View>() {
+            @Override
+            public void apply(@NonNull final View view, final int index) {
+                view.setEnabled(false);
+                view.setClickable(false);
+            }
+        });
+        listener.onManipulatorCropped(getPictureFile(getContext()), image.cropAsSingle());
     }
 
     @OnClick(R.id.ivManipulatorRotateLeft)

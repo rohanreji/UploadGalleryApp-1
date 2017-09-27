@@ -1,6 +1,5 @@
 package com.myapp.uploadgallery.ui.gallery;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,11 +14,8 @@ import com.myapp.uploadgallery.api.GalleryImage;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import dagger.android.support.AndroidSupportInjection;
 
 /**
  * Contains a gallery view with already uploaded images.
@@ -28,8 +24,7 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
     @BindView(R.id.rvGallery)
     RecyclerView galleryView;
 
-    @Inject
-    GalleryAdapter adapter;
+    private GalleryAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,10 +37,8 @@ public class GalleryFragment extends Fragment implements GalleryViewable {
         return view;
     }
 
-    @Override
-    public void onAttach(final Context context) {
-        AndroidSupportInjection.inject(this);
-        super.onAttach(context);
+    public void setAdapter(GalleryAdapter adapter) {
+        this.adapter = adapter;
     }
 
     @Override
