@@ -72,7 +72,7 @@ public class ManipulatorFragment extends Fragment implements ManipulatorViewable
 
     @OnClick(R.id.ivManipulatorCancel)
     public void close() {
-        getFragmentManager().popBackStack();
+        listener.onManipulatorClosed();
     }
 
     @OnClick(R.id.ivManipulatorSave)

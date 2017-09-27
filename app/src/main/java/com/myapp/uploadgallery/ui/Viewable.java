@@ -15,4 +15,5 @@ public interface Viewable {
     void onUploadImageError(Throwable throwable);
     void onUploadImageCompleted(GalleryImage image);
     void onUploadImageStarted();
+    void onManipulatorClosed();
 }

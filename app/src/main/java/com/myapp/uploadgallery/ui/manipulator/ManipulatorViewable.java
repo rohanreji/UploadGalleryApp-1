@@ -27,5 +27,7 @@ public interface ManipulatorViewable {
          * @param cropOperation   observable that performs crop operation (hot)
          */
         void onManipulatorCropped(File file, Single<Bitmap> cropOperation);
+
+        void onManipulatorClosed();
     }
 }

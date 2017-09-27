@@ -176,4 +176,11 @@ public class GalleryManagerImpl extends GalleryManager {
                 });
         subscriptions.add(disposable);
     }
+
+    @Override
+    public void onManipulatorClosed() {
+        if (view != null) {
+            view.
+        }
+    }
 }

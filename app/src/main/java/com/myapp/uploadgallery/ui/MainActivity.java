@@ -300,17 +300,21 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     public void onUploadImageError(final Throwable throwable) {
         showUploadAlert(throwable);
-        showProgress(false);
-        showFab(true);
+        onManipulatorClosed();
     }
 
     @Override
     public void onUploadImageCompleted(final GalleryImage image) {
+        // TODO: 9/27/17 update gallery
+        onManipulatorClosed();
+    }
+
+    @Override
+    public void onManipulatorClosed() {
         getFragmentManager().popBackStack();
         showProgress(false);
         showFab(true);
     }
-
     @Override
     public void onUploadImageStarted() {
         showProgress(true);
