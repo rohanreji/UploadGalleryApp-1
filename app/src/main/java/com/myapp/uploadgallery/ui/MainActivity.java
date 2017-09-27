@@ -110,7 +110,6 @@ public class MainActivity extends AppCompatActivity implements Viewable,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        galleryManager.onDestroy();
         galleryManager.unsubscribe();
         galleryManager.setView(null);
     }

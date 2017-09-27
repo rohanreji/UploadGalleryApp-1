@@ -92,33 +92,6 @@ public class GalleryManagerImpl extends GalleryManager {
         return endpoint.postImageForUser(userId.get(), part);
     }
 
-//    @Override
-//    public GalleryViewable.GalleryListener getGalleryListener() {
-//        return this;
-//    }
-//
-//    @Override
-//    public void onViewCreated() {
-//        imagesUpdated();
-//        view.showProgress(false);
-//    }
-//
-//    @Override
-//    public ManipulatorViewable.ManipulatorListener getManipulatorListener() {
-//        return this;
-//    }
-//
-//    @Override
-//    public void onManipulatorCropped(final File pictureFile, final Bitmap bitmap) {
-//        saveBitmap(pictureFile, bitmap)
-//                .flatMap((File file) -> uploadCachedPicture(file))
-//                .subscribeOn(backgroundScheduler)
-//                .observeOn(mainScheduler)
-//                .doOnError((Throwable t) -> view.showUploadAlert(t))
-//                .doFinally(() -> view.showProgress(false))
-//                .subscribe((GalleryImage galleryImage) -> view.showProgress(false),
-//                        (Throwable throwable) -> view.showUploadAlert(throwable));
-//    }
 
     @Override
     public void loadImages() {
@@ -148,12 +121,6 @@ public class GalleryManagerImpl extends GalleryManager {
     @Override
     public void unsubscribe() {
         subscriptions.clear();
-    }
-
-    @Override
-    public void onDestroy() {
-        this.view = null;
-        // TODO: 9/25/17 destroy other dependencies
     }
 
     @Override

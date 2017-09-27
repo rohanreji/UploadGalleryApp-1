@@ -6,10 +6,9 @@ import com.myapp.uploadgallery.ui.manipulator.ManipulatorViewable;
 /**
  * Manages calls between view and model.
  */
-public abstract class GalleryManager implements ManipulatorViewable.ManipulatorListener {
-    abstract public void setView(Viewable view);
-    abstract public void loadImages();
-    abstract public void subscribe();
-    abstract public void unsubscribe();
-    abstract public void onDestroy();
+public interface GalleryManager extends ManipulatorViewable.ManipulatorListener {
+    void setView(Viewable view);
+    void loadImages();
+    void subscribe();
+    void unsubscribe();
 }
