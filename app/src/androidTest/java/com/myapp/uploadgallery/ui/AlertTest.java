@@ -43,8 +43,8 @@ public class AlertTest {
         //verify gallery fragment is not shown
         onView(withId(R.id.rvGallery)).check(doesNotExist());
         //verify network alert is shown
-        onView(withId(R.string.dialog_network_title)).check(matches(isDisplayed()));
-        onView(withId(R.string.dialog_network_message)).check(matches(isDisplayed()));
+        onView(withId(android.R.string.ok)).check(matches(isDisplayed()));
+//        onView(withId(R.string.dialog_network_message)).check(matches(isDisplayed()));
     }
 
     @After

@@ -113,24 +113,14 @@ public class MainActivity extends AppCompatActivity implements Viewable,
         setSupportActionBar(toolbar);
 
         galleryManager.setView(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         galleryManager.subscribe(mIdlingResource);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        galleryManager.unsubscribe();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         galleryManager.setView(null);
+        galleryManager.unsubscribe();
     }
 
     @Override
@@ -355,5 +345,11 @@ public class MainActivity extends AppCompatActivity implements Viewable,
             mIdlingResource = new GalleryIdlingResource();
         }
         return mIdlingResource;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        showFab(true);
     }
 }
